@@ -25,7 +25,7 @@ You can inspect the GitLab startup logs with:
 
 ### Reset GitLab root password
 
-After starting the services, visit the GitLab web GUI here: http://gitlab.session1.techlunch.com:9980/. Since this is the first startup, it might take a while before the GitLab Docker container starts to respond to queries.
+After starting the services, visit the GitLab web GUI here: http://gitlab.session1.techlunch.com:9980/. Since this is the first startup, it might take a while before the GitLab Docker container starts to respond to queries. The initial setup should have been successfully completed once you read 'gitlab Reconfigured!' in the logs.
 
 Enter and confirm the new password for the newly create user *root*. Click 'Change your password' button.
 
@@ -37,7 +37,7 @@ After you logged in to the GitLab web GUI, click on the top right of your icon p
 
 Go to the 'Account' tab and change the default root username with your own username, then click the 'Update username' button.
 
-Now you can log in to the GitLab web GUI with the username you have just entered and the password you have entered before.
+Now you can log out and log back into the GitLab web GUI with the username you have just entered and the password you have entered before.
 
 ### Create a GitLab group
 
@@ -45,7 +45,7 @@ After you logged in to the GitLab web GUI, click on the "Create a group" link. E
 
 ### Create a GitLab project
 
-After having create the 'tech-lunch' group, click on the "New project" button. Enter 'hello-world' as project name and click 'Create project' button.
+After having created the 'tech-lunch' group, click on the "New project" button. Enter 'hello-world' as project name and click 'Create project' button.
 
 The first time you try to create the project you might see the following error message: '*TODO*', this is due to *TODO*, just click again the 'Create project' button and the new project creation should work fine this time.
 
