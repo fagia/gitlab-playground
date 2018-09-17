@@ -49,8 +49,6 @@ After you logged in to the GitLab web GUI, click on the "Create a group" link. E
 
 After having created the 'tech-lunch' group, click on the "New project" button. Enter 'hello-world' as project name and click 'Create project' button.
 
-The first time you try to create the project you might see the following error message: '*TODO*', this is due to *TODO*, just click again the 'Create project' button and the new project creation should work fine this time.
-
 ## Clean-up
 
 ### Stop services
