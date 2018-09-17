@@ -27,6 +27,8 @@ You can inspect the GitLab startup logs with:
 
 After starting the services, visit the GitLab web GUI here: http://gitlab.session1.techlunch.com:9980/. Since this is the first startup, it might take a while before the GitLab Docker container starts to respond to queries. The initial setup should have been successfully completed once you read 'gitlab Reconfigured!' in the logs.
 
+    docker-compose logs -f gitlab 2>&1 | grep 'gitlab Reconfigured!'
+
 Enter and confirm the new password for the newly create user *root*. Click 'Change your password' button.
 
 Now you can log in to the GitLab web GUI with default user 'root' and the password you have just entered.
