@@ -1,3 +1,6 @@
 /gitlab/conf/*
+!/gitlab/conf/.gitkeep
 /gitlab/data/*
+!/gitlab/data/.gitkeep
 /gitlab/logs/*
+!/gitlab/logs/.gitkeep
