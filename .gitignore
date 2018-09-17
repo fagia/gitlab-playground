@@ -4,3 +4,4 @@
 !/gitlab/data/.gitkeep
 /gitlab/logs/*
 !/gitlab/logs/.gitkeep
+/gitlab-runner/config/config.toml
