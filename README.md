@@ -38,3 +38,23 @@ After you logged in to the GitLab web GUI, click on the top right of your icon p
 Go to the 'Account' tab and change the default root username with your own username, then click the 'Update username' button.
 
 Now you can log in to the GitLab web GUI with the username you have just entered and the password you have entered before.
+
+### Create a GitLab group
+
+After you logged in to the GitLab web GUI, click on the "Create a group" link. Enter 'tech-lunch' as group path and click 'Create group' button.
+
+### Create a GitLab project
+
+After having create the 'tech-lunch' group, click on the "New project" button. Enter 'hello-world' as project name and click 'Create project' button.
+
+The first time you try to create the project you might see the following error message: '*TODO*', this is due to *TODO*, just click again the 'Create project' button and the new project creation should work fine this time.
+
+## Clean-up
+
+### Stop services
+
+    docker-compose down
+
+### Permanently delete persistent data
+
+    cd .. && rm -Rf session-1-gitlab-ci
