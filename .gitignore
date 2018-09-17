@@ -1,0 +1,3 @@
+/gitlab/conf/*
+/gitlab/data/*
+/gitlab/logs/*
