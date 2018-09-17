@@ -13,11 +13,11 @@ Add the following entry to your */etc/hosts* file:
 
     127.0.0.1       gitlab.session1.techlunch.com
 
-Clone this repository and start the GitLab service with docker-compose:
+Clone this repository and start the services with docker-compose:
 
     git clone https://github.com/fagia/tech-lunch-session-1-gitlab-ci.git session-1-gitlab-ci
     cd session-1-gitlab-ci
-    docker-compose up -d gitlab
+    docker-compose up -d
 
 You can inspect the GitLab startup logs with:
 
@@ -49,9 +49,25 @@ After you logged in to the GitLab web GUI, click on the "Create a group" link. E
 
 After having created the 'tech-lunch' group, click on the "New project" button. Enter 'hello-world' as project name and click 'Create project' button.
 
-### Start GitLab CI runner
+### Configure the GitLab CI runner
 
+Visit the 'tech-lunch' group's CI/CD settings section: http://gitlab.session1.techlunch.com:9980/groups/tech-lunch/-/settings/ci_cd, expand 'Runners' section and copy the registration token, then run the following command after having relaced *<GROUP-TOKEN-HERE>* with the value you've just copied:
 
+    REGISTRATION_TOKEN=<GROUP-TOKEN-HERE>
+    docker exec -it session-1-gitlab-ci_gitlab-runner_1 gitlab-runner register \
+        --non-interactive \
+        --url "http://gitlab:9980/" \
+        --registration-token "$REGISTRATION_TOKEN" \
+        --description "docker-runner" \
+        --run-untagged \
+        --locked="false" \
+        --executor "docker" \
+        --docker-image docker:stable \
+        --docker-volumes "/var/run/docker.sock:/var/run/docker.sock"
+
+You can inspect the GitLab Runner configuration logs with:
+
+    docker-compose logs -f gitlab-runner
 
 ## Clean-up
 
