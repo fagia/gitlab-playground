@@ -56,7 +56,7 @@ Visit the 'tech-lunch' group's CI/CD settings section: http://gitlab.session1.te
     REGISTRATION_TOKEN=<GROUP-TOKEN-HERE>
     docker exec -it session-1-gitlab-ci_gitlab-runner_1 gitlab-runner register \
         --non-interactive \
-        --url "http://gitlab:9980/" \
+        --url "http://gitlab.session1.techlunch.com:9980/" \
         --registration-token "$REGISTRATION_TOKEN" \
         --description "docker-runner" \
         --run-untagged \
@@ -68,6 +68,25 @@ Visit the 'tech-lunch' group's CI/CD settings section: http://gitlab.session1.te
 You can inspect the GitLab Runner configuration logs with:
 
     docker-compose logs -f gitlab-runner
+
+### Add CI/CD to first project
+
+Go to 'hello-world' project and click 'New file' button in order to create the *.gitlab-ci.yml* file which will define the specific CI/CD stages that will be executed for this project.
+
+Paste the following as the *.gitlab-ci.yml* file content:
+
+    image: docker:stable
+
+    before_script:
+    - docker info
+
+    stages:
+    - hello
+
+    say-hello:
+    stage: hello
+    script:
+        - docker run hello-world
 
 ## Clean-up
 
