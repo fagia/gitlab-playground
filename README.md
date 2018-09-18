@@ -36,7 +36,7 @@ Enter and confirm the new password for the newly create user *root*. Click 'Chan
 
 Now you can log in to the GitLab web GUI with default user 'root' and the password you have just entered.
 
-#### Change GitLab's default user username
+#### Change GitLab's default user username (optional)
 
 After you logged in to the GitLab web GUI, click on the top right of your icon profile, and click the 'Settings' icon to setup your profile.
 
@@ -119,7 +119,24 @@ In order to test the availability of the private docker registry hosted by GitLa
 
     docker login gitlab.session1.techlunch.com:4567
 
-TODO
+#### Add private docker registry login from GitLab CI pipeline
+
+Edit the *.gitlab-ci.yml* file of the 'hello-world' project and replace it's contents with the following:
+
+<pre><b>
+    before_script:
+        - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN gitlab.session1.techlunch.com:4567
+</b>
+    stages:
+        - hello
+
+    hello-docker:
+        stage: hello
+        script:
+            - docker run hello-world
+</pre>
+
+TODO (build image and push it to private docker registry)
 
 #### Trigger service-tests after each successful hello-world project build
 
