@@ -123,17 +123,17 @@ In order to test the availability of the private docker registry hosted by GitLa
 
 Edit the *.gitlab-ci.yml* file of the 'hello-world' project and replace it's contents with the following:
 
-<pre><b>
-    before_script:
-        - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN gitlab.session1.techlunch.com:4567
-</b>
-    stages:
-        - hello
+<pre>
+<b>before_script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN gitlab.session1.techlunch.com:4567</b>
 
-    hello-docker:
-        stage: hello
-        script:
-            - docker run hello-world
+stages:
+    - hello
+
+hello-docker:
+    stage: hello
+    script:
+        - docker run hello-world
 </pre>
 
 TODO (build image and push it to private docker registry)
