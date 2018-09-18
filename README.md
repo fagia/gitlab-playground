@@ -50,6 +50,12 @@ After you logged in to the GitLab web GUI, click on the "Create a group" link. E
 
 #### Configure a GitLab CI group runner
 
+In order to run CI/CD jobs, GitLab needs to have runners. There are various type of runners and you can get a deeper understanding of the available options here: https://docs.gitlab.com/ce/ci/runners/README.html. In this session we will leverage a *docker group runner*.
+
+A *docker runner* executes it's job inside a docker image, in our case we will setup a docker in docker execution by running the job inside a docker image ('docker in docker').
+
+A *group runner* is a runner that can be picked up by any job of any project that belongs to the group which the runner is associated to (as long as the runner is configured to run for any tag or the job is marked with a matching tag).
+
 Visit the 'tech-lunch' group's CI/CD settings section: http://gitlab.session1.techlunch.com:9980/groups/tech-lunch/-/settings/ci_cd, expand 'Runners' section and copy the registration token, then run the following command after having relaced *GROUP-TOKEN-HERE* with the value you've just copied:
 
     REGISTRATION_TOKEN=GROUP-TOKEN-HERE
@@ -57,7 +63,7 @@ Visit the 'tech-lunch' group's CI/CD settings section: http://gitlab.session1.te
         --non-interactive \
         --url "http://gitlab.session1.techlunch.com:9980/" \
         --registration-token "$REGISTRATION_TOKEN" \
-        --description "docker-runner" \
+        --description "docker-group-runner" \
         --run-untagged \
         --locked="false" \
         --executor "docker" \
@@ -89,13 +95,13 @@ Paste the following as the *.gitlab-ci.yml* file content:
         script:
         - docker run hello-world
 
-As soon as the file gets pushed to the repo, a new pipeline will start, check the output of the first execution here: http://gitlab.session1.techlunch.com:9980/tech-lunch/hello-world/pipelines
+As soon as the file gets pushed to the repo, a new pipeline will start, you can check the output of the first execution here: http://gitlab.session1.techlunch.com:9980/tech-lunch/hello-world/pipelines
 
 #### Improve the CI/CD stages for the first project
 
-Each project has to define the stages it needs to build, validate and deploy each and every commits that is pushed to its git repository.
+Each project has to define the stages it needs to build, validate and deploy each and every commit that is pushed to its git repository.
 
-Here it is a sample of some of the possible stages that a project could define:
+Here it is a sample of some of the possible stages that a project should define:
 
 TODO
 
