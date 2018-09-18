@@ -21,13 +21,13 @@ Clone this repository and start the services with docker-compose:
 
 You can inspect the GitLab startup logs with:
 
-    docker-compose logs -f gitlab
+    docker-compose logs -f gitlab.session1.techlunch.com
 
 ### Reset GitLab root password
 
 After starting the services, visit the GitLab web GUI here: http://gitlab.session1.techlunch.com:9980/. Since this is the first startup, it might take a while before the GitLab Docker container starts to respond to queries. The initial setup should have been successfully completed once you read 'gitlab Reconfigured!' in the logs.
 
-    docker-compose logs -f gitlab 2>&1 | grep 'gitlab Reconfigured!'
+    docker-compose logs -f gitlab.session1.techlunch.com 2>&1 | grep 'gitlab Reconfigured!'
 
 Enter and confirm the new password for the newly create user *root*. Click 'Change your password' button.
 
@@ -63,6 +63,7 @@ Visit the 'tech-lunch' group's CI/CD settings section: http://gitlab.session1.te
         --locked="false" \
         --executor "docker" \
         --docker-image docker:stable \
+        --docker-network-mode session-1-gitlab-ci_default \
         --docker-volumes "/var/run/docker.sock:/var/run/docker.sock"
 
 You can inspect the GitLab Runner configuration logs with:
@@ -84,9 +85,9 @@ Paste the following as the *.gitlab-ci.yml* file content:
     - hello
 
     say-hello:
-    stage: hello
-    script:
-        - docker run hello-world
+        stage: hello
+        script:
+            - docker run hello-world
 
 ## Clean-up
 
