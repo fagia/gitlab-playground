@@ -51,9 +51,9 @@ After having created the 'tech-lunch' group, click on the "New project" button. 
 
 ### Configure the GitLab CI runner
 
-Visit the 'tech-lunch' group's CI/CD settings section: http://gitlab.session1.techlunch.com:9980/groups/tech-lunch/-/settings/ci_cd, expand 'Runners' section and copy the registration token, then run the following command after having relaced *<GROUP-TOKEN-HERE>* with the value you've just copied:
+Visit the 'tech-lunch' group's CI/CD settings section: http://gitlab.session1.techlunch.com:9980/groups/tech-lunch/-/settings/ci_cd, expand 'Runners' section and copy the registration token, then run the following command after having relaced *GROUP-TOKEN-HERE* with the value you've just copied:
 
-    REGISTRATION_TOKEN=<GROUP-TOKEN-HERE>
+    REGISTRATION_TOKEN=GROUP-TOKEN-HERE
     docker exec -it session-1-gitlab-ci_gitlab-runner_1 gitlab-runner register \
         --non-interactive \
         --url "http://gitlab.session1.techlunch.com:9980/" \
@@ -76,18 +76,13 @@ Go to 'hello-world' project and click 'New file' button in order to create the *
 
 Paste the following as the *.gitlab-ci.yml* file content:
 
-    image: docker:stable
-
-    before_script:
-    - docker info
-
     stages:
     - hello
 
-    say-hello:
+    hello-docker:
         stage: hello
         script:
-            - docker run hello-world
+        - docker run hello-world
 
 ## Clean-up
 
