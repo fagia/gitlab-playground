@@ -137,4 +137,4 @@ TODO
 
 ### Permanently delete persistent data
 
-    cd .. && rm -Rf session-1-gitlab-ci
+    rm -Rf ./gitlab ./gitlab-runner
