@@ -8,11 +8,13 @@ services:
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         external_url 'http://gitlab.session1.techlunch.com:9980'
+        registry_external_url 'http://gitlab.session1.techlunch.com:4567'
         gitlab_rails['gitlab_shell_ssh_port'] = 9922
         unicorn['socket'] = '/opt/gitlab/var/unicorn/gitlab.socket'
     ports:
       - '9980:9980'
       - '9922:22'
+      - '4567:4567'
     volumes:
       - './gitlab/conf:/etc/gitlab'
       - './gitlab/logs:/var/log/gitlab'

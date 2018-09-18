@@ -88,12 +88,12 @@ Go to 'hello-world' project and click 'New file' button in order to create the *
 Paste the following as the *.gitlab-ci.yml* file content:
 
     stages:
-    - hello
+        - hello
 
     hello-docker:
         stage: hello
         script:
-        - docker run hello-world
+            - docker run hello-world
 
 As soon as the file gets pushed to the repo, a new pipeline will start, you can check the output of the first execution here: http://gitlab.session1.techlunch.com:9980/tech-lunch/hello-world/pipelines
 
@@ -111,9 +111,13 @@ TODO
 
 Go to the 'tech-lunch' group, click on the "New project" button. Enter 'service-tests' as project name and click 'Create project' button.
 
-#### Use GitLab as docker registry
+#### Use GitLab as private docker registry
 
-Since we need to build some private docker images to be used in our internal CI/CD infrastructure, we can leverage GitLab support for private docker registries.
+Since we need to build some private docker images to be used in our internal CI/CD infrastructure, we can leverage GitLab support for private docker registries: https://docs.gitlab.com/ce/user/project/container_registry.html
+
+In order to test the availability of the private docker registry hosted by GitLab, type the following command and enter your GitLab credentials:
+
+    docker login gitlab.session1.techlunch.com:4567
 
 TODO
 
@@ -126,6 +130,10 @@ TODO
 ### Stop services
 
     docker-compose down
+
+### Logout from GitLab private docker registry
+
+    docker logout gitlab.session1.techlunch.com:4567
 
 ### Permanently delete persistent data
 
