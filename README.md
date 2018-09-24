@@ -143,9 +143,81 @@ In the *before_script* section the pipeline will login into the private docker r
 
 Click on the 'WebIDE' button in the project 'ci-cd-commands' home page and use the WebIDE GUI to add a new folder inside the repo and to name it 'tech-lunch-hello-world' (this is going to be the base directory in which we build a new private private docker image).
 
-Add a new file inside the new dir and name it *Dockerfile*, put the following contents in it:
+Add a new file inside the new dir, name it *Dockerfile* and put the following contents in it:
 
 <pre>
+FROM python:3-alpine
+
+WORKDIR /usr/src/app
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+CMD [ "python", "./tech-lunch-hello-world.py" ]
+</pre>
+
+In the same dir, create also the two following files:
+
+**requirements.txt**
+
+<pre>
+python-gitlab
+</pre>
+
+For now, the only library specified in the requirements file will be *python-gitlab* that is a quite useful Python package providing access to the GitLab API.
+
+**tech-lunch-hello-world.py**
+
+<pre>
+import gitlab
+import getopt
+
+gitlab_connection = None
+
+def parse_opts(argv)
+    help_msg = 'Usage: {0} -t &lt;gitlabPrivateToken&gt; -u &lt;gitlabBaseUrl&gt;'.format(argv[0])
+    token = None
+    base_url = None
+    try:
+        opts = getopt.getopt(argv[1:],'ht:u:',['token=', 'url=', 'help'])
+    except getopt.GetoptError:
+        print ('Error: unknown option(s)')
+        print (help_msg)
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            print (help_msg)
+            sys.exit()
+        elif opt in ("-t", "--token"):
+            token = arg
+        elif opt in ("-u", "--url"):
+            base_url = arg
+    if not token:
+        print ('Error: missing gitlab private token')
+        print (help_msg)
+        sys.exit(2)
+    if not base_url:
+        print ('Error: missing gitlab base url')
+        print (help_msg)
+        sys.exit(2)
+    return base_url, token 
+
+def init_connection_to_gitlab(base_url, token):
+    gitlab_connection = gitlab.Gitlab(base_url, private_token=token)
+
+def list_gitlab_projects():
+    projects = gitlab_connection.projects.list()
+    print (projects)
+
+def main(argv):
+    base_url, token = parse_opts(argv)
+    init_connection_to_gitlab(base_url, token)
+    list_gitlab_projects()
+
+if __name__ == "__main__":
+    main(sys.argv)
 
 </pre>
 
