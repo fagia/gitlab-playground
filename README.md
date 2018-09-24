@@ -107,10 +107,6 @@ TODO
 
 ### Orchestrate GitLab projects
 
-#### Create another GitLab project
-
-Go to the 'tech-lunch' group, click on the "New project" button. Enter 'service-tests' as project name and click 'Create project' button.
-
 #### Use GitLab as private docker registry
 
 Since we need to build some private docker images to be used in our internal CI/CD infrastructure, we can leverage GitLab support for private docker registries: https://docs.gitlab.com/ce/user/project/container_registry.html
@@ -119,9 +115,14 @@ In order to test the availability of the private docker registry hosted by GitLa
 
     docker login gitlab.session1.techlunch.com:4567
 
-#### Add private docker registry login from GitLab CI pipeline
+This login will be used directly in the pipelines that build and push images to the private docker registry.
 
-Edit the *.gitlab-ci.yml* file of the 'hello-world' project and replace it's contents with the following:
+#### Add a repository for building and pushing private images
+
+Create a new project inside the 'tech-lunch' group, name it 'ci-cd-commands'.
+We're going to use this project to be able to share inside the 'tech-lunch' private group some common CI/CD commands such as triggering new pipelines or waiting for running pipelines to terminate.
+
+Add the *.gitlab-ci.yml* file into the newly created project with the following contents:
 
 <pre>
 <b>before_script:
@@ -136,7 +137,31 @@ hello-docker:
         - docker run hello-world
 </pre>
 
-TODO (build image and push it to private docker registry)
+In the *before_script* section the pipeline will login into the private docker registry so that it can push the images that will be built in this project's pipelines.
+
+### Build and push the first docker image
+
+Click on the 'WebIDE' button in the project 'ci-cd-commands' home page and use the WebIDE GUI to add a new folder inside the repo and to name it 'tech-lunch-hello-world' (this is going to be the base directory in which we build a new private private docker image).
+
+Add a new file inside the new dir and name it *Dockerfile*, put the following contents in it:
+
+<pre>
+
+</pre>
+
+#### Create another GitLab project
+
+Go to the 'tech-lunch' group, click on the "New project" button. Enter 'service-tests' as project name and click 'Create project' button.
+
+Then add a *.gitlab-ci.yml* file to this new repo with the following basic stage:
+
+    stages:
+        - hello
+
+    hello-docker:
+        stage: hello
+        script:
+            - docker run hello-world
 
 #### Trigger service-tests after each successful hello-world project build
 
