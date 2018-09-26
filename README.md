@@ -4,6 +4,8 @@
 
 - Git: https://git-scm.com/
 - Docker + docker-compose: https://www.docker.com/get-started
+- docker pull gitlab/gitlab-ce:latest (this will speed you the next steps :) )
+- docker pull gitlab/gitlab-runner:latest (this too :) )
 
 ## Step-by-step guide
 
@@ -124,7 +126,7 @@ This login will be used directly in the pipelines that build and push images to 
 #### Add a subgroup for CI/CD commands
 
 Create a new subgroup inside the 'tech-lunch' group, name it 'ci-cd-commands'.
-This subgroup will contain some common CI/CD commands (such as triggering new pipelines or waiting for running pipelines to terminate). These commands will have the form of docker images that can be pulled and runned inside the 'tech-lunch' private group.
+This subgroup will contain some common CI/CD commands (such as triggering new pipelines or waiting for running pipelines to terminate). These commands will have the form of docker images that can be pulled and runned inside the 'tech-lunch' private group pipelines.
 
 #### Create the first CI/CD command
 
@@ -147,7 +149,7 @@ hello-docker:
         - docker run --rm hello-world
 </pre>
 
-In the *before_script* section the pipeline will login into the private docker registry so that it can push the image that will be built in this project's pipelines. In the *after_script* the pipeline
+In the *before_script* section the pipeline will login into the private docker registry so that it can push the image that will be built in this project's pipeline stages. In the *after_script* the pipeline just logs out from the private docker registry.
 
 ### Build and push the first docker image
 
@@ -175,7 +177,7 @@ In the same root directory, create also the two following files:
 python-gitlab
 </pre>
 
-For now, the only library specified in the requirements file will be *python-gitlab* that is a quite useful Python package providing access to the GitLab API.
+For now, the only library specified in the requirements file will be *python-gitlab* that is a quite useful Python package providing access to the GitLab API (https://python-gitlab.readthedocs.io/en/stable/).
 
 **cmd-list-projects.py**
 
@@ -261,14 +263,14 @@ Now use the WebIDE GUI to stage and commit all the new and changed files and see
 
 #### Create an user with read/write PAT to invoke GitLab API from CI/CD commands
 
-Since this is still an open issue: https://gitlab.com/gitlab-org/gitlab-ce/issues/41084, we ha to create a *fake* user and issue a PAT (Personal Access Token) that we'll pass to the CI/CD commands that work with GitLab API.
+Since this is still an open issue for the CE version of GitLab: https://gitlab.com/gitlab-org/gitlab-ce/issues/41084, we have to create a *fake* user and issue a PAT (Personal Access Token) that we'll pass to the CI/CD commands that work with GitLab API.
 
 Go to GitLab GUI Admin area, go to Users area and click button 'New user'. Give the new user 'ci-cd-executor' as both name and username and 'ci-cd-executor@nowhere.com' as email. Click button 'Create user' and then 'Edit' button and enter a password for this user and 'Save changes'.
+Go to Groups area, enter the 'tech-lunch' group and add the user 'ci-cd-executor' as *Maintainer* of the group.
 Now logout from 'root' user and log back in as 'ci-cd-executor'.
 Once a new passowrd has been set and logged in again, click on the top right user avatar and access the 'Settings' area and then the 'Access tokens' area.
 Add a new personal access token with name 'ci-cd-execution' and the 'api' scope checked. Copy the newly created token value and log back as 'root'.
 Access the CI/CD settings area for the 'tech-lunch' group and open the 'Variables' section, here add a new protected variable with name 'COMMANDS_API_TOKEN' and value the personal access token value you just copied.
-Go to the GitLab Admin area, got to Groups area and add the user 'i-cd-executor' as *Maintainer* of the 'tech-lunch' group.
 
 #### Create another GitLab project
 
