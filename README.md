@@ -303,6 +303,10 @@ list-projects:
 
 TODO
 
+### Monitor GitLab pipelines
+
+TODO
+
 ## Clean-up (optional)
 
 ### Stop services
