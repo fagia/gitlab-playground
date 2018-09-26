@@ -2,3 +2,4 @@
 /gitlab/data/*
 /gitlab/logs/*
 /gitlab-runner/config/*
+/gitlab-runner/builds/*

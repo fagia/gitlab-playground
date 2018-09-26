@@ -52,7 +52,7 @@ After you logged in to the GitLab web GUI, click on the "Create a group" link. E
 
 In order to run CI/CD jobs, GitLab needs to have runners. There are various type of runners and you can get a deeper understanding of the available options here: https://docs.gitlab.com/ce/ci/runners/README.html. In this session we will leverage a *docker group runner*.
 
-A *docker runner* executes it's job inside a docker image, in our case we will setup a docker in docker execution by running the job inside a docker image ('docker in docker').
+A *docker runner* executes it's job inside a docker image. In our case we will setup a **docker socket binding** execution by running the job inside a docker image which have docker available through the bind-mount */var/run/docker.sock* (for more details: https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-socket-binding).
 
 A *group runner* is a runner that can be picked up by any job of any project that belongs to the group which the runner is associated to (as long as the runner is configured to run for any tag or the job is marked with a matching tag).
 
@@ -67,9 +67,13 @@ Visit the 'tech-lunch' group's CI/CD settings section: http://gitlab.session1.te
         --run-untagged \
         --locked="false" \
         --executor "docker" \
+        --env "HOST_BUILDS_VOLUME_PREFIX=$(pwd)/gitlab-runner" \
+        --env "HOST_NETWORK=session-1-gitlab-ci_default" \
+        --env "GITLAB_SERVER_BASE_URL=http://gitlab.session1.techlunch.com:9980/" \
         --docker-image docker:stable \
         --docker-network-mode session-1-gitlab-ci_default \
-        --docker-volumes "/var/run/docker.sock:/var/run/docker.sock"
+        --docker-volumes "/var/run/docker.sock:/var/run/docker.sock" \
+        --docker-volumes "$(pwd)/gitlab-runner/builds:/builds"
 
 You can inspect the GitLab Runner configuration logs with:
 
@@ -93,7 +97,7 @@ Paste the following as the *.gitlab-ci.yml* file content:
     hello-docker:
         stage: hello
         script:
-            - docker run hello-world
+            - docker run --rm hello-world
 
 As soon as the file gets pushed to the repo, a new pipeline will start, you can check the output of the first execution here: http://gitlab.session1.techlunch.com:9980/tech-lunch/hello-world/pipelines
 
@@ -117,16 +121,22 @@ In order to test the availability of the private docker registry hosted by GitLa
 
 This login will be used directly in the pipelines that build and push images to the private docker registry.
 
-#### Add a repository for building and pushing private images
+#### Add a subgroup for CI/CD commands
 
-Create a new project inside the 'tech-lunch' group, name it 'ci-cd-commands'.
-We're going to use this project to be able to share inside the 'tech-lunch' private group some common CI/CD commands such as triggering new pipelines or waiting for running pipelines to terminate.
+Create a new subgroup inside the 'tech-lunch' group, name it 'ci-cd-commands'.
+This subgroup will contain some common CI/CD commands (such as triggering new pipelines or waiting for running pipelines to terminate). These commands will have the form of docker images that can be pulled and runned inside the 'tech-lunch' private group.
 
-Add the *.gitlab-ci.yml* file into the newly created project with the following contents:
+#### Create the first CI/CD command
+
+Inside the subgroup 'ci-cd-commands' create a new project and name it 'cmd-list-projects'.
+Add the *.gitlab-ci.yml* file into the newly created project with the following contents just to start the first hello world pipeline for this new project and to verify that the docker login actually succeds:
 
 <pre>
 <b>before_script:
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN gitlab.session1.techlunch.com:4567</b>
+    - echo $CI_BUILD_TOKEN | docker login --username=$CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+
+after_script:
+    - docker logout $CI_REGISTRY</b>
 
 stages:
     - hello
@@ -134,16 +144,14 @@ stages:
 hello-docker:
     stage: hello
     script:
-        - docker run hello-world
+        - docker run --rm hello-world
 </pre>
 
-In the *before_script* section the pipeline will login into the private docker registry so that it can push the images that will be built in this project's pipelines.
+In the *before_script* section the pipeline will login into the private docker registry so that it can push the image that will be built in this project's pipelines. In the *after_script* the pipeline
 
 ### Build and push the first docker image
 
-Click on the 'WebIDE' button in the project 'ci-cd-commands' home page and use the WebIDE GUI to add a new folder inside the repo and to name it 'tech-lunch-hello-world' (this is going to be the base directory in which we build a new private private docker image).
-
-Add a new file inside the new dir, name it *Dockerfile* and put the following contents in it:
+Click on the 'WebIDE' button in the project 'cmd-list-projects' home page and use the WebIDE GUI to add a new file inside the repo, name it *Dockerfile* and put the following contents in it:
 
 <pre>
 FROM python:3-alpine
@@ -151,14 +159,15 @@ FROM python:3-alpine
 WORKDIR /usr/src/app
 
 COPY requirements.txt ./
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD [ "python", "./tech-lunch-hello-world.py" ]
+ENTRYPOINT [ "python", "./cmd-list-projects.py" ]
 </pre>
 
-In the same dir, create also the two following files:
+In the same root directory, create also the two following files:
 
 **requirements.txt**
 
@@ -168,72 +177,125 @@ python-gitlab
 
 For now, the only library specified in the requirements file will be *python-gitlab* that is a quite useful Python package providing access to the GitLab API.
 
-**tech-lunch-hello-world.py**
+**cmd-list-projects.py**
 
 <pre>
-import gitlab
 import getopt
+import gitlab
+import sys
 
-gitlab_connection = None
-
-def parse_opts(argv)
+def parse_opts(argv):
     help_msg = 'Usage: {0} -t &lt;gitlabPrivateToken&gt; -u &lt;gitlabBaseUrl&gt;'.format(argv[0])
     token = None
     base_url = None
     try:
-        opts = getopt.getopt(argv[1:],'ht:u:',['token=', 'url=', 'help'])
+        optlist, args = getopt.getopt(argv[1:], 'ht:u:', ['help', 'token=', 'url='])
     except getopt.GetoptError:
-        print ('Error: unknown option(s)')
-        print (help_msg)
+        print('Error: unknown option(s)')
+        print(help_msg)
         sys.exit(2)
-    for opt, arg in opts:
+    for opt, val in optlist:
         if opt in ("-h", "--help"):
-            print (help_msg)
+            print(help_msg)
             sys.exit()
         elif opt in ("-t", "--token"):
-            token = arg
+            token = val
         elif opt in ("-u", "--url"):
-            base_url = arg
+            base_url = val
     if not token:
-        print ('Error: missing gitlab private token')
-        print (help_msg)
+        print('Error: missing gitlab oauth token')
+        print(help_msg)
         sys.exit(2)
     if not base_url:
-        print ('Error: missing gitlab base url')
-        print (help_msg)
+        print('Error: missing gitlab base url')
+        print(help_msg)
         sys.exit(2)
-    return base_url, token 
+    return base_url, token
 
 def init_connection_to_gitlab(base_url, token):
-    gitlab_connection = gitlab.Gitlab(base_url, private_token=token)
+    return gitlab.Gitlab(base_url, private_token=token)
 
-def list_gitlab_projects():
-    projects = gitlab_connection.projects.list()
-    print (projects)
+def list_gitlab_projects(gl):
+    projects = gl.projects.list()
+    for project in projects:
+        print(project.name)
 
 def main(argv):
     base_url, token = parse_opts(argv)
-    init_connection_to_gitlab(base_url, token)
-    list_gitlab_projects()
+    gl = init_connection_to_gitlab(base_url, token)
+    list_gitlab_projects(gl)
 
 if __name__ == "__main__":
     main(sys.argv)
-
 </pre>
+
+The above script is accepting an url pointing to a GitLab server and an API token as input options and it lists the projects exisiting in the targeted GitLab server.
+
+Now edit the *.gitlab-ci.yml* file by replacing its contents with the following:
+
+<pre>
+variables:
+    IMAGE_VERSION: 0.0.1
+
+before_script:
+    - echo $CI_BUILD_TOKEN | docker login --username=$CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+
+after_script:
+    - docker logout $CI_REGISTRY
+
+stages:
+    - build and push docker image
+
+build-and-push:
+    stage: build and push docker image
+    script:
+        - docker build --tag $CI_REGISTRY_IMAGE:$IMAGE_VERSION .
+        - docker build --tag $CI_REGISTRY_IMAGE:latest .
+        - docker push $CI_REGISTRY_IMAGE:$IMAGE_VERSION
+        - docker push $CI_REGISTRY_IMAGE:latest
+</pre>
+
+The newly defined pipeline stage will build and push the *cmd-list-projects* docker image.
+
+Now use the WebIDE GUI to stage and commit all the new and changed files and see the new pipeline running.
+
+#### Create an user with read/write PAT to invoke GitLab API from CI/CD commands
+
+Since this is still an open issue: https://gitlab.com/gitlab-org/gitlab-ce/issues/41084, we ha to create a *fake* user and issue a PAT (Personal Access Token) that we'll pass to the CI/CD commands that work with GitLab API.
+
+Go to GitLab GUI Admin area, go to Users area and click button 'New user'. Give the new user 'ci-cd-executor' as both name and username and 'ci-cd-executor@nowhere.com' as email. Click button 'Create user' and then 'Edit' button and enter a password for this user and 'Save changes'.
+Now logout from 'root' user and log back in as 'ci-cd-executor'.
+Once a new passowrd has been set and logged in again, click on the top right user avatar and access the 'Settings' area and then the 'Access tokens' area.
+Add a new personal access token with name 'ci-cd-execution' and the 'api' scope checked. Copy the newly created token value and log back as 'root'.
+Access the CI/CD settings area for the 'tech-lunch' group and open the 'Variables' section, here add a new protected variable with name 'COMMANDS_API_TOKEN' and value the personal access token value you just copied.
+Go to the GitLab Admin area, got to Groups area and add the user 'i-cd-executor' as *Maintainer* of the 'tech-lunch' group.
 
 #### Create another GitLab project
 
 Go to the 'tech-lunch' group, click on the "New project" button. Enter 'service-tests' as project name and click 'Create project' button.
 
-Then add a *.gitlab-ci.yml* file to this new repo with the following basic stage:
+Then add a *.gitlab-ci.yml* file to this new repo with the following basic stage just to try out the command that we just builded and pushed in the previous steps:
 
-    stages:
-        - hello
+<pre>
+variables:
+    CMD_LIST_PROJECTS_IMAGE: "gitlab.session1.techlunch.com:4567/tech-lunch/ci-cd-commands/cmd-list-projects:0.0.1"
+    CMD_LIST_PROJECTS: "--rm --network $HOST_NETWORK $CMD_LIST_PROJECTS_IMAGE --url $GITLAB_SERVER_BASE_URL --token $COMMANDS_API_TOKEN"
 
-    hello-docker:
-        stage: hello
-        script:
-            - docker run hello-world
+before_script:
+    - echo $CI_BUILD_TOKEN | docker login --username=$CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+
+after_script:
+    - docker logout $CI_REGISTRY
+
+stages:
+    - hello
+
+list-projects:
+    stage: hello
+    script:
+        - docker pull $CMD_LIST_PROJECTS_IMAGE
+        - docker run $CMD_LIST_PROJECTS
+</pre>
 
 #### Trigger service-tests after each successful hello-world project build
 
