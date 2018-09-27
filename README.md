@@ -58,7 +58,7 @@ A *docker runner* executes it's job inside a docker image. In our case we will s
 
 A *group runner* is a runner that can be picked up by any job of any project that belongs to the group which the runner is associated to (as long as the runner is configured to run for any tag or the job is marked with a matching tag).
 
-Visit the 'tech-lunch' group's CI/CD settings section: http://gitlab.session1.techlunch.com:9980/groups/tech-lunch/-/settings/ci_cd, expand 'Runners' section and copy the registration token, then run the following command after having relaced *GROUP-TOKEN-HERE* with the value you've just copied:
+Visit the 'tech-lunch' group's CI/CD settings section (http://gitlab.session1.techlunch.com:9980/groups/tech-lunch/-/settings/ci_cd), expand 'Runners' section and copy the registration token, then run the following command after having relaced *GROUP-TOKEN-HERE* with the value you've just copied:
 
     REGISTRATION_TOKEN=GROUP-TOKEN-HERE
     docker exec -it session-1-gitlab-ci_gitlab-runner_1 gitlab-runner register \
@@ -109,7 +109,55 @@ Each project has to define the stages it needs to build, validate and deploy eac
 
 Here it is a sample of some of the possible stages that a project should define:
 
-TODO
+    stages:
+        - build
+        - test
+        - deploy
+        - downstream
+
+    build-some-stuff:
+        stage: build
+        script:
+            - docker run --rm alpine /bin/sh -c "echo 'fake build starting...' && sleep 3 && echo '...fake build done!'"
+
+    unit-tests:
+        stage: test
+        script:
+            - docker run --rm alpine /bin/sh -c "echo 'fake unit tests starting...' && sleep 6 && echo '...fake unit tests done!'"
+
+    lint-tests:
+        stage: test
+        script:
+            - docker run --rm alpine /bin/sh -c "echo 'fake lint starting...' && sleep 2 && echo '...fake lint done!'"
+
+    static-code-analysis:
+        stage: test
+        script:
+            - docker run --rm alpine /bin/sh -c "echo 'fake static code analysis starting...' && sleep 4 && echo '...fake static code analysis done!'"
+
+    package-and-deploy:
+        stage: deploy
+        script:
+            - docker run --rm alpine /bin/sh -c "echo 'fake packaging starting...' && sleep 2 && echo '...fake packaging done!'"
+            - docker run --rm alpine /bin/sh -c "echo 'fake deploy starting...' && sleep 2 && echo '...fake deploy done!'"
+
+    trigger-downstream-pipelines:
+        stage: downstream
+        script:
+            - docker run --rm alpine /bin/sh -c "echo 'trigger downstream pipelines is coming soon ;)'"
+
+#### Increase GitLab runner concurrency
+
+As you may have noticed, as of now, even if there are more than one job defined for a specific stage, these jobs are being run sequentially.
+This is because when registering a runner, the default concurrency of 1 cannot be changed (there are several open issues on this).
+However it's possible to tweak runners configuration at any time by editing the config.toml file.
+To increase the concurrency level to 5 jobs, run the following command:
+
+    docker exec -it session-1-gitlab-ci_gitlab-runner_1 bin/sh -c "sed -i -E 's/^concurrent = [0-9]+$/concurrent = 5/' /etc/gitlab-runner/config.toml && cat /etc/gitlab-runner/config.toml"
+
+The ruuner configurations is automatically reloaded (you can check the gitlab-runner log for it).
+
+Now you can retrigger the pipeline you runned in the previous step and see the three jobs in the 'test' stage running in parallel.
 
 ### Orchestrate GitLab projects
 
