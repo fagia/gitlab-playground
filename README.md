@@ -4,8 +4,8 @@
 
 - Git: https://git-scm.com/
 - Docker + docker-compose: https://www.docker.com/get-started
-- Run <pre>docker pull gitlab/gitlab-ce:latest</pre> (this will speed the next steps :) )
-- Run <pre>docker pull gitlab/gitlab-runner:latest</pre> (this too :) )
+- Run `docker pull gitlab/gitlab-ce:latest` (this will speed the next steps :) )
+- Run `docker pull gitlab/gitlab-runner:latest` (this too :) )
 
 ## Step-by-step guide
 
@@ -13,7 +13,7 @@
 
 #### Start GitLab server
 
-Add the following entry to your */etc/hosts* file:
+Add the following entry to your `/etc/hosts` file:
 
     127.0.0.1       gitlab.session1.techlunch.com
 
@@ -29,36 +29,36 @@ You can inspect the GitLab startup logs with:
 
 #### Reset GitLab root password
 
-Since this is the first startup, it might take a while before the GitLab Docker container starts to respond to queries. The initial setup should have been successfully completed once you read 'gitlab Reconfigured!' in the logs.
+Since this is the first startup, it might take a while before the GitLab Docker container starts to respond to queries. The initial setup should have been successfully completed once you read `gitlab Reconfigured!` in the logs.
 
     docker-compose logs -f gitlab.session1.techlunch.com 2>&1 | grep 'gitlab Reconfigured!'
 
 After the GitLab service has started successfully, visit the GitLab web GUI here: http://gitlab.session1.techlunch.com:9980/. 
-Enter and confirm the new password for the newly create user *root*. Click 'Change your password' button.
+Enter and confirm the new password for the newly create user `root`. Click `Change your password` button.
 
-Now you can log in to the GitLab web GUI with default user 'root' and the password you have just entered.
+Now you can log in to the GitLab web GUI with default user `root` and the password you have just entered.
 
 #### Change GitLab's default user username (optional)
 
-After you logged in to the GitLab web GUI, click on the top right of your icon profile, and click the 'Settings' icon to setup your profile.
+After you logged in to the GitLab web GUI, click on the top right of your icon profile, and click the `Settings` icon to setup your profile.
 
-Go to the 'Account' tab and change the default root username with your own username, then click the 'Update username' button.
+Go to the `Account` tab and change the default root username with your own username, then click the `Update username` button.
 
 Now you can log out and log back into the GitLab web GUI with the username you have just entered and the password you have entered before.
 
 #### Create a GitLab group
 
-After you logged in to the GitLab web GUI, click on the "Create a group" link. Enter 'tech-lunch' as group path and click 'Create group' button.
+After you logged in to the GitLab web GUI, click on the "Create a group" link. Enter `tech-lunch` as group path and click `Create group` button.
 
 #### Configure a GitLab CI group runner
 
-In order to run CI/CD jobs, GitLab needs to have runners. There are various type of runners and you can get a deeper understanding of the available options here: https://docs.gitlab.com/ce/ci/runners/README.html. In this session we will leverage a *docker group runner*.
+In order to run CI/CD jobs, GitLab needs to have runners. There are various type of runners and you can get a deeper understanding of the available options here: https://docs.gitlab.com/ce/ci/runners/README.html. In this session we will leverage a `docker group runner`.
 
-A *docker runner* executes it's job inside a docker image. In our case we will setup a **docker socket binding** execution by running the job inside a docker image which have docker available through the bind-mount */var/run/docker.sock* (for more details: https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-socket-binding).
+A `docker runner` executes it's job inside a docker image. In our case we will setup a `docker socket binding` execution by running the job inside a docker image which have docker available through the bind-mount `/var/run/docker.sock` (for more details: https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-socket-binding).
 
-A *group runner* is a runner that can be picked up by any job of any project that belongs to the group which the runner is associated to (as long as the runner is configured to run for any tag or the job is marked with a matching tag).
+A `group runner` is a runner that can be picked up by any job of any project that belongs to the group which the runner is associated to (as long as the runner is configured to run for any tag or the job is marked with a matching tag).
 
-Visit the 'tech-lunch' group's CI/CD settings section (http://gitlab.session1.techlunch.com:9980/groups/tech-lunch/-/settings/ci_cd), expand 'Runners' section and copy the registration token, then run the following command after having relaced *GROUP-TOKEN-HERE* with the value you've just copied:
+Visit the `tech-lunch` group's CI/CD settings section (http://gitlab.session1.techlunch.com:9980/groups/tech-lunch/-/settings/ci_cd), expand `Runners` section and copy the registration token, then run the following command after having relaced `GROUP-TOKEN-HERE` with the value you have just copied:
 
     REGISTRATION_TOKEN=GROUP-TOKEN-HERE
     docker exec -it session-1-gitlab-ci_gitlab-runner_1 gitlab-runner register \
@@ -85,13 +85,13 @@ Now all the projects that will be created in this group will be able to use this
 
 #### Create a GitLab project
 
-Go to the 'tech-lunch' group, click on the "New project" button. Enter 'hello-world' as project name and click 'Create project' button.
+Go to the `tech-lunch` group, click on the "New project" button. Enter `hello-world` as project name and click `Create project` button.
 
 #### Add CI/CD to the first project
 
-Go to 'hello-world' project and click 'New file' button in order to create the *.gitlab-ci.yml* file which will define the specific CI/CD stages that will be executed for this project.
+Go to `hello-world` project and click `New file` button in order to create the `.gitlab-ci.yml` file which will define the specific CI/CD stages that will be executed for this project.
 
-Paste the following as the *.gitlab-ci.yml* file content:
+Paste the following as the `.gitlab-ci.yml` file content:
 
     stages:
         - hello
@@ -157,7 +157,7 @@ To increase the concurrency level to 5 jobs, run the following command:
 
 The ruuner configurations is automatically reloaded (you can check the gitlab-runner log for it).
 
-Now you can retrigger the pipeline you runned in the previous step and see the three jobs in the 'test' stage running in parallel.
+Now you can retrigger the pipeline you runned in the previous step and see the three jobs in the `test` stage running in parallel.
 
 ### Orchestrate GitLab projects
 
@@ -173,13 +173,13 @@ This login will be used directly in the pipelines that build and push images to 
 
 #### Add a subgroup for CI/CD commands
 
-Create a new subgroup inside the 'tech-lunch' group, name it 'ci-cd-commands'.
-This subgroup will contain some common CI/CD commands (such as triggering new pipelines or waiting for running pipelines to terminate). These commands will have the form of docker images that can be pulled and runned inside the 'tech-lunch' private group pipelines.
+Create a new subgroup inside the `tech-lunch` group, name it `ci-cd-commands`.
+This subgroup will contain some common CI/CD commands (such as triggering new pipelines or waiting for running pipelines to terminate). These commands will have the form of docker images that can be pulled and runned inside the `tech-lunch` private group pipelines.
 
 #### Create the first CI/CD command
 
-Inside the subgroup 'ci-cd-commands' create a new project and name it 'cmd-tag-project'.
-Add the *.gitlab-ci.yml* file into the newly created project with the following contents just to start the first hello world pipeline for this new project and to verify that the docker login actually succeds:
+Inside the subgroup `ci-cd-commands` create a new project and name it `cmd-tag-project`.
+Add the `.gitlab-ci.yml` file into the newly created project with the following contents just to start the first hello world pipeline for this new project and to verify that the docker login actually succeds:
 
 <pre>
 <b>before_script:
@@ -197,11 +197,11 @@ hello-docker:
         - docker run --rm hello-world
 </pre>
 
-In the *before_script* section the pipeline will login into the private docker registry so that it can push the image that will be built in this project's pipeline stages. In the *after_script* the pipeline just logs out from the private docker registry.
+In the `before_script` section the pipeline will login into the private docker registry so that it can push the image that will be built in this project `after_script` the pipeline just logs out from the private docker registry.
 
 ### Build and push the first docker image
 
-Click on the 'WebIDE' button in the project 'cmd-tag-project' home page and use the WebIDE GUI to add a new file inside the repo, name it *Dockerfile* and put the following contents in it:
+Click on the `WebIDE` button in the project `cmd-tag-project` home page and use the WebIDE GUI to add a new file inside the repo, name it `Dockerfile` and put the following contents in it:
 
 <pre>
 FROM python:3-alpine
@@ -225,7 +225,7 @@ In the same root directory, create also the two following files:
 python-gitlab
 </pre>
 
-For now, the only library specified in the requirements file will be *python-gitlab* that is a quite useful Python package providing access to the GitLab API (https://python-gitlab.readthedocs.io/en/stable/).
+For now, the only library specified in the requirements file will be `python-gitlab` that is a quite useful Python package providing access to the GitLab API (https://python-gitlab.readthedocs.io/en/stable/).
 
 **cmd-tag-project.py**
 
@@ -293,7 +293,7 @@ The above script is accepting as input options:
 - the group/name of the project to be tagged
 - the tag name to be created
 
-Now edit the *.gitlab-ci.yml* file by replacing its contents with the following:
+Now edit the `.gitlab-ci.yml` file by replacing its contents with the following:
 
 <pre>
 variables:
@@ -317,7 +317,7 @@ build-and-push:
         - docker push $CI_REGISTRY_IMAGE:latest
 </pre>
 
-The newly defined pipeline stage will build and push the *cmd-tag-project* docker image.
+The newly defined pipeline stage will build and push the `cmd-tag-project` docker image.
 
 Now use the WebIDE GUI to stage and commit all the new and changed files and see the new pipeline running.
 
@@ -325,18 +325,18 @@ Now use the WebIDE GUI to stage and commit all the new and changed files and see
 
 Since this is still an open issue for the CE version of GitLab: https://gitlab.com/gitlab-org/gitlab-ce/issues/41084, we have to create a *fake* user and issue a PAT (Personal Access Token) that we'll pass to the CI/CD commands that work with GitLab API.
 
-Go to GitLab GUI Admin area, go to Users area and click button 'New user'. Give the new user 'ci-cd-executor' as both name and username and 'ci-cd-executor@nowhere.com' as email. Click button 'Create user' and then 'Edit' button and enter a password for this user and 'Save changes'.
-Go to Groups area, enter the 'tech-lunch' group and add the user 'ci-cd-executor' as *Maintainer* of the group.
-Now logout from 'root' user and log back in as 'ci-cd-executor'.
-Once a new passowrd has been set and logged in again, click on the top right user avatar and access the 'Settings' area and then the 'Access tokens' area.
-Add a new personal access token with name 'ci-cd-execution' and the 'api' scope checked. Copy the newly created token value and log back as 'root'.
-Access the CI/CD settings area for the 'tech-lunch' group and open the 'Variables' section, here add a new protected variable with name 'COMMANDS_API_TOKEN' and value the personal access token value you just copied.
+Go to GitLab GUI Admin area, go to Users area and click button `New user`. Give the new user `ci-cd-executor` as both name and username and `ci-cd-executor@nowhere.com` as email. Click button `Create user` and then `Edit` button and enter a password for this user and `Save changes`.
+Go to Groups area, enter the `tech-lunch` group and add the user `ci-cd-executor` as `Maintainer` of the group.
+Now logout from `root` user and log back in as `ci-cd-executor`.
+Once a new passowrd has been set and logged in again, click on the top right user avatar and access the `Settings` area and then the `Access tokens` area.
+Add a new personal access token with name `ci-cd-execution` and the `api` scope checked. Copy the newly created token value and log back as `root`.
+Access the CI/CD settings area for the `tech-lunch` group and open the `Variables` section, here add a new protected variable with name `COMMANDS_API_TOKEN` and value the personal access token value you just copied.
 
 #### Create a GitLab project for running service tests
 
-Go to the 'tech-lunch' group, click on the "New project" button. Enter 'service-tests' as project name and click 'Create project' button.
+Go to the `tech-lunch` group, click on the "New project" button. Enter `service-tests` as project name and click `Create project` button.
 
-Then add a *.gitlab-ci.yml* file to this new repo with the following basic stage just to try out the command that we just builded and pushed in the previous steps:
+Then add a `.gitlab-ci.yml` file to this new repo with the following basic stage just to try out the command that we just builded and pushed in the previous steps:
 
 <pre>
 variables:
@@ -365,7 +365,7 @@ Once the pipeline that has just been created completes, a new tag comes into the
 
 #### Trigger service-tests after successful hello-world project builds
 
-Now edit again the *.gitlab-ci.yml* file in the 'service-tests' project and replace its exisiting content with the following:
+Now edit again the `.gitlab-ci.yml` file in the `service-tests` project and replace its exisiting content with the following:
 
     stages:
         - service tests
@@ -384,7 +384,7 @@ Now edit again the *.gitlab-ci.yml* file in the 'service-tests' project and repl
         script:
             - docker run --rm alpine /bin/sh -c "echo 'fake run service tests on commit'"
 
-Then edit the *.gitlab-ci.yml* file in the 'hello-world' project and replace its exisiting content with the following:
+Then edit the `.gitlab-ci.yml` file in the `hello-world` project and replace its exisiting content with the following:
 
 <pre>
 stages:
@@ -435,7 +435,7 @@ after_script:
     - docker logout $CI_REGISTRY</b>
 </pre>
 
-Now, after each and every successful build of the 'hello-world' project, a new tag is created in the 'service-tests' project and a new pipeline runs the service tests.
+Now, after each and every successful build of the `hello-world` project, a new tag is created in the `service-tests` project and a new pipeline runs the service tests.
 
 ### Monitor GitLab pipelines
 
