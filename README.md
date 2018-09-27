@@ -4,8 +4,8 @@
 
 - Git: https://git-scm.com/
 - Docker + docker-compose: https://www.docker.com/get-started
-- docker pull gitlab/gitlab-ce:latest (this will speed you the next steps :) )
-- docker pull gitlab/gitlab-runner:latest (this too :) )
+- Run <pre>docker pull gitlab/gitlab-ce:latest</pre> (this will speed the next steps :) )
+- Run <pre>docker pull gitlab/gitlab-runner:latest</pre> (this too :) )
 
 ## Step-by-step guide
 
