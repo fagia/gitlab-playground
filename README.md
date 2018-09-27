@@ -332,7 +332,7 @@ Once a new passowrd has been set and logged in again, click on the top right use
 Add a new personal access token with name 'ci-cd-execution' and the 'api' scope checked. Copy the newly created token value and log back as 'root'.
 Access the CI/CD settings area for the 'tech-lunch' group and open the 'Variables' section, here add a new protected variable with name 'COMMANDS_API_TOKEN' and value the personal access token value you just copied.
 
-#### Create another GitLab project
+#### Create a GitLab project for running service tests
 
 Go to the 'tech-lunch' group, click on the "New project" button. Enter 'service-tests' as project name and click 'Create project' button.
 
