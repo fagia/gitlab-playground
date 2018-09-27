@@ -11,22 +11,12 @@ A step-by-step guide to showcase GitLab CI/CD capabilities
 
 ## Step-by-step guide
 
-### STEP 1: Create a GitLab project and add CI/CD capabilities to it
+### STEP 1: [Create a GitLab project and add CI/CD capabilities to it](docs/STEP_1.md)
 
-[Create a GitLab project and add CI/CD capabilities to it](docs/STEP_1.md)
+### STEP 2: [Use GitLab as private docker registry](docs/STEP_2.md)
 
-### STEP 2: Use GitLab as private docker registry
+### STEP 3: [Orchestrate GitLab projects](docs/STEP_3.md)
 
-[Use GitLab as private docker registry](docs/STEP_2.md)
+### STEP 4: [Monitor GitLab pipelines](docs/STEP_4.md)
 
-### STEP 3: Orchestrate GitLab projects
-
-[Orchestrate GitLab projects](docs/STEP_3.md)
-
-### STEP 4: Monitor GitLab pipelines
-
-[Monitor GitLab pipelines](docs/STEP_4.md)
-
-### STEP 5: Clean-up (optional)
-
-[Clean-up (optional)](docs/STEP_5.md)
+### STEP 5: [Clean-up (optional)](docs/STEP_5.md)
