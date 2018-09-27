@@ -178,7 +178,7 @@ This subgroup will contain some common CI/CD commands (such as triggering new pi
 
 #### Create the first CI/CD command
 
-Inside the subgroup 'ci-cd-commands' create a new project and name it 'cmd-list-projects'.
+Inside the subgroup 'ci-cd-commands' create a new project and name it 'cmd-tag-project'.
 Add the *.gitlab-ci.yml* file into the newly created project with the following contents just to start the first hello world pipeline for this new project and to verify that the docker login actually succeds:
 
 <pre>
@@ -201,7 +201,7 @@ In the *before_script* section the pipeline will login into the private docker r
 
 ### Build and push the first docker image
 
-Click on the 'WebIDE' button in the project 'cmd-list-projects' home page and use the WebIDE GUI to add a new file inside the repo, name it *Dockerfile* and put the following contents in it:
+Click on the 'WebIDE' button in the project 'cmd-tag-project' home page and use the WebIDE GUI to add a new file inside the repo, name it *Dockerfile* and put the following contents in it:
 
 <pre>
 FROM python:3-alpine
@@ -214,7 +214,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENTRYPOINT [ "python", "./cmd-list-projects.py" ]
+ENTRYPOINT [ "python", "./cmd-tag-project.py" ]
 </pre>
 
 In the same root directory, create also the two following files:
@@ -227,19 +227,27 @@ python-gitlab
 
 For now, the only library specified in the requirements file will be *python-gitlab* that is a quite useful Python package providing access to the GitLab API (https://python-gitlab.readthedocs.io/en/stable/).
 
-**cmd-list-projects.py**
+**cmd-tag-project.py**
 
 <pre>
 import getopt
 import gitlab
 import sys
 
+def check_mandatory_opt(help_msg, name, value):
+    if not value:
+        print('Error: missing option "{}"'.format(name))
+        print(help_msg)
+        sys.exit(2)
+
 def parse_opts(argv):
-    help_msg = 'Usage: {0} -t &lt;gitlabPrivateToken&gt; -u &lt;gitlabBaseUrl&gt;'.format(argv[0])
+    help_msg = 'Usage: {} -t &lt;gitlabPrivateToken&gt; -u &lt;gitlabBaseUrl&gt;'.format(argv[0])
     token = None
     base_url = None
+    project_group_and_name = None
+    tag_name = None
     try:
-        optlist, args = getopt.getopt(argv[1:], 'ht:u:', ['help', 'token=', 'url='])
+        optlist, args = getopt.getopt(argv[1:], 'ht:u:p:t:', ['help', 'token=', 'url=', 'projectgroupandname=', 'tagname='])
     except getopt.GetoptError:
         print('Error: unknown option(s)')
         print(help_msg)
@@ -252,34 +260,38 @@ def parse_opts(argv):
             token = val
         elif opt in ("-u", "--url"):
             base_url = val
-    if not token:
-        print('Error: missing gitlab oauth token')
-        print(help_msg)
-        sys.exit(2)
-    if not base_url:
-        print('Error: missing gitlab base url')
-        print(help_msg)
-        sys.exit(2)
-    return base_url, token
+        elif opt in ("-p", "--projectgroupandname"):
+            project_group_and_name = val
+        elif opt in ("-t", "--tagname"):
+            tag_name = val
+    check_mandatory_opt(help_msg, 'token', token)
+    check_mandatory_opt(help_msg, 'url', base_url)
+    check_mandatory_opt(help_msg, 'projectgroupandname', project_group_and_name)
+    check_mandatory_opt(help_msg, 'tagname', tag_name)
+    return base_url, token, project_group_and_name, tag_name
 
 def init_connection_to_gitlab(base_url, token):
     return gitlab.Gitlab(base_url, private_token=token)
 
-def list_gitlab_projects(gl):
-    projects = gl.projects.list()
-    for project in projects:
-        print(project.name)
+def tag_gitlab_project(gl, project_group_and_name, tag_name):
+    print('tagging project "{}" with tag "{}"'.format(project_group_and_name, tag_name))
+    project = gl.projects.get(project_group_and_name)
+    project.tags.create({'tag_name': tag_name, 'ref': 'master'})
 
 def main(argv):
-    base_url, token = parse_opts(argv)
+    base_url, token, project_group_and_name, tag_name = parse_opts(argv)
     gl = init_connection_to_gitlab(base_url, token)
-    list_gitlab_projects(gl)
+    tag_gitlab_project(gl, project_group_and_name, tag_name)
 
 if __name__ == "__main__":
     main(sys.argv)
 </pre>
 
-The above script is accepting an url pointing to a GitLab server and an API token as input options and it lists the projects exisiting in the targeted GitLab server.
+The above script is accepting as input options:
+- an url pointing to a GitLab server
+- an API token
+- the group/name of the project to be tagged
+- the tag name to be created
 
 Now edit the *.gitlab-ci.yml* file by replacing its contents with the following:
 
@@ -305,7 +317,7 @@ build-and-push:
         - docker push $CI_REGISTRY_IMAGE:latest
 </pre>
 
-The newly defined pipeline stage will build and push the *cmd-list-projects* docker image.
+The newly defined pipeline stage will build and push the *cmd-tag-project* docker image.
 
 Now use the WebIDE GUI to stage and commit all the new and changed files and see the new pipeline running.
 
@@ -328,8 +340,8 @@ Then add a *.gitlab-ci.yml* file to this new repo with the following basic stage
 
 <pre>
 variables:
-    CMD_LIST_PROJECTS_IMAGE: "gitlab.session1.techlunch.com:4567/tech-lunch/ci-cd-commands/cmd-list-projects:0.0.1"
-    CMD_LIST_PROJECTS: "--rm --network $HOST_NETWORK $CMD_LIST_PROJECTS_IMAGE --url $GITLAB_SERVER_BASE_URL --token $COMMANDS_API_TOKEN"
+    CMD_TAG_PROJECT_IMAGE: "gitlab.session1.techlunch.com:4567/tech-lunch/ci-cd-commands/cmd-tag-project:0.0.1"
+    CMD_TAG_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --url $GITLAB_SERVER_BASE_URL --token $COMMANDS_API_TOKEN --projectgroupandname tech-lunch/service-tests --tagname ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}"
 
 before_script:
     - echo $CI_BUILD_TOKEN | docker login --username=$CI_REGISTRY_USER --password-stdin $CI_REGISTRY
@@ -340,16 +352,90 @@ after_script:
 stages:
     - hello
 
-list-projects:
+tag-project:
     stage: hello
+    only:
+        - master
     script:
-        - docker pull $CMD_LIST_PROJECTS_IMAGE
-        - docker run $CMD_LIST_PROJECTS
+        - docker pull $CMD_TAG_PROJECT_IMAGE
+        - docker run $CMD_TAG_PROJECT
 </pre>
 
-#### Trigger service-tests after each successful hello-world project build
+Once the pipeline that has just been created completes, a new tag comes into the repo (http://gitlab.session1.techlunch.com:9980/tech-lunch/service-tests/tags)
 
-TODO
+#### Trigger service-tests after successful hello-world project builds
+
+Now edit again the *.gitlab-ci.yml* file in the 'service-tests' project and replace its exisiting content with the following:
+
+    stages:
+        - service tests
+
+    run-on-upstream:
+        stage: service tests
+        only:
+            - tags
+        script:
+            - docker run --rm alpine /bin/sh -c "echo 'fake run service tests on upstream change'"
+
+    run-on-commit:
+        stage: service tests
+        only:
+            - branches
+        script:
+            - docker run --rm alpine /bin/sh -c "echo 'fake run service tests on commit'"
+
+Then edit the *.gitlab-ci.yml* file in the 'hello-world' project and replace its exisiting content with the following:
+
+<pre>
+stages:
+    - build
+    - test
+    - deploy
+    - downstream
+
+build-some-stuff:
+    stage: build
+    script:
+        - docker run --rm alpine /bin/sh -c "echo 'fake build starting...' && sleep 3 && echo '...fake build done!'"
+
+unit-tests:
+    stage: test
+    script:
+        - docker run --rm alpine /bin/sh -c "echo 'fake unit tests starting...' && sleep 6 && echo '...fake unit tests done!'"
+
+lint-tests:
+    stage: test
+    script:
+        - docker run --rm alpine /bin/sh -c "echo 'fake lint starting...' && sleep 2 && echo '...fake lint done!'"
+
+static-code-analysis:
+    stage: test
+    script:
+        - docker run --rm alpine /bin/sh -c "echo 'fake static code analysis starting...' && sleep 4 && echo '...fake static code analysis done!'"
+
+package-and-deploy:
+    stage: deploy
+    script:
+        - docker run --rm alpine /bin/sh -c "echo 'fake packaging starting...' && sleep 2 && echo '...fake packaging done!'"
+        - docker run --rm alpine /bin/sh -c "echo 'fake deploy starting...' && sleep 2 && echo '...fake deploy done!'"
+
+<b>trigger-downstream-pipelines:
+    stage: downstream
+    variables:
+        CMD_TAG_PROJECT_IMAGE: "gitlab.session1.techlunch.com:4567/tech-lunch/ci-cd-commands/cmd-tag-project:0.0.1"
+        CMD_TAG_SERVICE_TESTS_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --url $GITLAB_SERVER_BASE_URL --token $COMMANDS_API_TOKEN --projectgroupandname tech-lunch/service-tests --tagname ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}"
+    script:
+        - docker pull $CMD_TAG_PROJECT_IMAGE
+        - docker run $CMD_TAG_SERVICE_TESTS_PROJECT
+
+before_script:
+    - echo $CI_BUILD_TOKEN | docker login --username=$CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+
+after_script:
+    - docker logout $CI_REGISTRY</b>
+</pre>
+
+Now, after each and every successful build of the 'hello-world' project, a new tag is created in the 'service-tests' project and a new pipeline runs the service tests.
 
 ### Monitor GitLab pipelines
 
