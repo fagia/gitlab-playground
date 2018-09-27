@@ -144,6 +144,6 @@ To increase the concurrency level to 5 jobs, run the following command:
 
     docker exec -it session-1-gitlab-ci_gitlab-runner_1 bin/sh -c "sed -i -E 's/^concurrent = [0-9]+$/concurrent = 5/' /etc/gitlab-runner/config.toml && cat /etc/gitlab-runner/config.toml"
 
-The ruuner configurations is automatically reloaded (you can check the gitlab-runner log for it).
+The runner configurations is automatically reloaded (you can check the gitlab-runner log for it).
 
 Now you can retrigger the pipeline you runned in the previous step and see the three jobs in the `test` stage running in parallel.
