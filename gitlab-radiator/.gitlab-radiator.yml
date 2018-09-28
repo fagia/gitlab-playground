@@ -2,7 +2,7 @@ gitlab:
   url: http://gitlab.session1.techlunch.com:9980/
 projects:
   exclude: tech-lunch/ci-cd-commands/.*
-  order: ['status', 'name']
+  order: ['name']
 interval: 1
 port: 3000
 zoom: 0.7
