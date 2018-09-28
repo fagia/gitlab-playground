@@ -3,7 +3,7 @@ version: '3'
 services:
 
   gitlab.session1.techlunch.com:
-    image: 'gitlab/gitlab-ce:latest'
+    image: 'gitlab/gitlab-ce:11.3.0-ce.0'
     hostname: 'gitlab.session1.techlunch.com'
     environment:
       GITLAB_OMNIBUS_CONFIG: |
@@ -19,7 +19,7 @@ services:
       - './gitlab/data:/var/opt/gitlab'
 
   gitlab-runner:
-    image: 'gitlab/gitlab-runner:latest'
+    image: 'gitlab/gitlab-runner:v11.3.1'
     volumes:
       - './gitlab-runner/config:/etc/gitlab-runner'
       - '/var/run/docker.sock:/var/run/docker.sock'

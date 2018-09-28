@@ -6,8 +6,9 @@ A step-by-step guide to showcase GitLab CI/CD capabilities
 
 - Git: https://git-scm.com/
 - Docker + docker-compose: https://www.docker.com/get-started
-- Run `docker pull gitlab/gitlab-ce:latest` (this will speed the next steps :) )
-- Run `docker pull gitlab/gitlab-runner:latest` (this too :) )
+- Run `docker pull gitlab/gitlab-ce:11.3.0-ce.0` (this will speed up the next steps...)
+- Run `docker pull gitlab/gitlab-runner:v11.3.1` (...this too...)
+- Run `docker pull matteocajani/gitlab-radiator:0.0.2` (...and this too :) )
 
 ## Step-by-step guide
 
