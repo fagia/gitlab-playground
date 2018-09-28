@@ -1,0 +1,12 @@
+gitlab:
+  url: http://gitlab.session1.techlunch.com:9980/
+projects:
+  exclude: tech-lunch/ci-cd-commands/.*
+  order: ['status', 'name']
+port: 3000
+zoom: 0.85
+columns: 4
+header:
+  title: 'Tech Lunch projects'
+  subtitle: 'Pipelines monitor'
+  image: 'https://www.thoughtworks.com/imgs/run_sustainable_business.png'

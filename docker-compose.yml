@@ -23,3 +23,12 @@ services:
     volumes:
       - './gitlab-runner/config:/etc/gitlab-runner'
       - '/var/run/docker.sock:/var/run/docker.sock'
+
+  gitlab-radiator:
+    image: 'matteocajani/gitlab-radiator:0.0.2'
+    environment:
+      - GITLAB_ACCESS_TOKEN
+    ports:
+      - '9933:3000'
+    volumes:
+      - './gitlab-radiator/.gitlab-radiator.yml:/home/node/.gitlab-radiator.yml'
