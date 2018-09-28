@@ -107,28 +107,28 @@ Here it is a sample of some of the possible stages that a project should define:
     build-some-stuff:
         stage: build
         script:
-            - docker run --rm alpine /bin/sh -c "echo 'fake build starting...' && sleep 3 && echo '...fake build done!'"
+            - docker run --rm alpine /bin/sh -c "echo 'fake build starting...' && echo '...fake build done!'"
 
     unit-tests:
         stage: test
         script:
-            - docker run --rm alpine /bin/sh -c "echo 'fake unit tests starting...' && sleep 6 && echo '...fake unit tests done!'"
+            - docker run --rm alpine /bin/sh -c "echo 'fake unit tests starting...' && echo '...fake unit tests done!'"
 
     lint-tests:
         stage: test
         script:
-            - docker run --rm alpine /bin/sh -c "echo 'fake lint starting...' && sleep 2 && echo '...fake lint done!'"
+            - docker run --rm alpine /bin/sh -c "echo 'fake lint starting...' && echo '...fake lint done!'"
 
     static-code-analysis:
         stage: test
         script:
-            - docker run --rm alpine /bin/sh -c "echo 'fake static code analysis starting...' && sleep 4 && echo '...fake static code analysis done!'"
+            - docker run --rm alpine /bin/sh -c "echo 'fake static code analysis starting...' && echo '...fake static code analysis done!'"
 
     package-and-deploy:
         stage: deploy
         script:
-            - docker run --rm alpine /bin/sh -c "echo 'fake packaging starting...' && sleep 2 && echo '...fake packaging done!'"
-            - docker run --rm alpine /bin/sh -c "echo 'fake deploy starting...' && sleep 2 && echo '...fake deploy done!'"
+            - docker run --rm alpine /bin/sh -c "echo 'fake packaging starting...' && echo '...fake packaging done!'"
+            - docker run --rm alpine /bin/sh -c "echo 'fake deploy starting...' && echo '...fake deploy done!'"
 
     trigger-downstream-pipelines:
         stage: downstream

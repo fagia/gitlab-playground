@@ -1,6 +1,6 @@
 ## STEP 3: Orchestrate GitLab projects
 
-Since we want to have some useful CI/CD scripts to be shared and re-used in our internal CI/CD infrastructure, we can leverage the GitLab private docker registry to build and internally publish some private docker images to be used as *commands* to be runned in pipelines' scripts.
+Since we want to have some useful CI/CD scripts to be shared and re-used in our internal CI/CD infrastructure, we can leverage the GitLab private docker registry to build and internally publish some private docker images to be used as `commands` to be runned in pipelines' scripts.
 
 ### Add a subgroup for CI/CD commands
 
@@ -28,7 +28,7 @@ hello-docker:
         - docker run --rm hello-world
 </pre>
 
-In the `before_script` section the pipeline will login into the private docker registry so that it can push the image that will be built in this project `after_script` the pipeline just logs out from the private docker registry.
+In the `before_script` section the pipeline will login into the private docker registry so that it can push the image that will be built in this project. With `after_script` the pipeline just logs out from the private docker registry.
 
 ### Build and push the first docker image
 
@@ -172,7 +172,7 @@ Then add a `.gitlab-ci.yml` file to this new repo with the following basic stage
 <pre>
 variables:
     CMD_TAG_PROJECT_IMAGE: "gitlab.session1.techlunch.com:4567/tech-lunch/ci-cd-commands/cmd-tag-project:0.0.1"
-    CMD_TAG_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --url $GITLAB_SERVER_BASE_URL --token $COMMANDS_API_TOKEN --projectgroupandname tech-lunch/service-tests --tagname ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}"
+    CMD_TAG_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --url $GITLAB_SERVER_BASE_URL --token $COMMANDS_API_TOKEN --projectgroupandname tech-lunch/service-tests --tagname ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}_${CI_JOB_ID}"
 
 before_script:
     - echo $CI_BUILD_TOKEN | docker login --username=$CI_REGISTRY_USER --password-stdin $CI_REGISTRY
@@ -227,34 +227,34 @@ stages:
 build-some-stuff:
     stage: build
     script:
-        - docker run --rm alpine /bin/sh -c "echo 'fake build starting...' && sleep 3 && echo '...fake build done!'"
+        - docker run --rm alpine /bin/sh -c "echo 'fake build starting...' && echo '...fake build done!'"
 
 unit-tests:
     stage: test
     script:
-        - docker run --rm alpine /bin/sh -c "echo 'fake unit tests starting...' && sleep 6 && echo '...fake unit tests done!'"
+        - docker run --rm alpine /bin/sh -c "echo 'fake unit tests starting...' && echo '...fake unit tests done!'"
 
 lint-tests:
     stage: test
     script:
-        - docker run --rm alpine /bin/sh -c "echo 'fake lint starting...' && sleep 2 && echo '...fake lint done!'"
+        - docker run --rm alpine /bin/sh -c "echo 'fake lint starting...' && echo '...fake lint done!'"
 
 static-code-analysis:
     stage: test
     script:
-        - docker run --rm alpine /bin/sh -c "echo 'fake static code analysis starting...' && sleep 4 && echo '...fake static code analysis done!'"
+        - docker run --rm alpine /bin/sh -c "echo 'fake static code analysis starting...' && echo '...fake static code analysis done!'"
 
 package-and-deploy:
     stage: deploy
     script:
-        - docker run --rm alpine /bin/sh -c "echo 'fake packaging starting...' && sleep 2 && echo '...fake packaging done!'"
-        - docker run --rm alpine /bin/sh -c "echo 'fake deploy starting...' && sleep 2 && echo '...fake deploy done!'"
+        - docker run --rm alpine /bin/sh -c "echo 'fake packaging starting...' && echo '...fake packaging done!'"
+        - docker run --rm alpine /bin/sh -c "echo 'fake deploy starting...' && echo '...fake deploy done!'"
 
 <b>trigger-downstream-pipelines:
     stage: downstream
     variables:
         CMD_TAG_PROJECT_IMAGE: "gitlab.session1.techlunch.com:4567/tech-lunch/ci-cd-commands/cmd-tag-project:0.0.1"
-        CMD_TAG_SERVICE_TESTS_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --url $GITLAB_SERVER_BASE_URL --token $COMMANDS_API_TOKEN --projectgroupandname tech-lunch/service-tests --tagname ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}"
+        CMD_TAG_SERVICE_TESTS_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --url $GITLAB_SERVER_BASE_URL --token $COMMANDS_API_TOKEN --projectgroupandname tech-lunch/service-tests --tagname ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}_${CI_JOB_ID}"
     script:
         - docker pull $CMD_TAG_PROJECT_IMAGE
         - docker run $CMD_TAG_SERVICE_TESTS_PROJECT

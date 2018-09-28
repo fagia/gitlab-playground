@@ -3,9 +3,10 @@ gitlab:
 projects:
   exclude: tech-lunch/ci-cd-commands/.*
   order: ['status', 'name']
+interval: 1
 port: 3000
-zoom: 0.85
-columns: 4
+zoom: 0.7
+columns: 2
 header:
   title: 'Tech Lunch projects'
   subtitle: 'Pipelines monitor'
