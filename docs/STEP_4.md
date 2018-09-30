@@ -12,4 +12,4 @@ Run the following command after having relaced `API_TOKEN_HERE` with the value y
 
 Now you can see the GitLab Radiator GUI here: http://gitlab.session1.techlunch.com:9933/
 
-## STEP 5: [Clean-up (optional)](docs/STEP_5.md)
+## STEP 5: [Clean-up (optional)](STEP_5.md)

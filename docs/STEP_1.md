@@ -148,4 +148,4 @@ The runner configurations is automatically reloaded (you can check the gitlab-ru
 
 Now you can retrigger the pipeline you runned in the previous step and see the three jobs in the `test` stage running in parallel.
 
-## STEP 2: [Use GitLab as private docker registry](docs/STEP_2.md)
+## STEP 2: [Use GitLab as private docker registry](STEP_2.md)
