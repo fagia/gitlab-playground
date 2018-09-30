@@ -11,3 +11,5 @@ Run the following command after having relaced `API_TOKEN_HERE` with the value y
     GITLAB_ACCESS_TOKEN=API_TOKEN_HERE docker-compose up -d gitlab-radiator
 
 Now you can see the GitLab Radiator GUI here: http://gitlab.session1.techlunch.com:9933/
+
+## STEP 5: [Clean-up (optional)](docs/STEP_5.md)

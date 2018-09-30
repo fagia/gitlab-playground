@@ -267,3 +267,5 @@ after_script:
 </pre>
 
 Now, after each and every successful build of the `hello-world` project, a new tag is created in the `service-tests` project and a new pipeline runs the service tests.
+
+## STEP 4: [Monitor GitLab pipelines](docs/STEP_4.md)

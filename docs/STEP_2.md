@@ -9,3 +9,5 @@ In order to test the availability of the private docker registry hosted by GitLa
 This login will be used directly in the pipelines that build and push images to the private docker registry. Each project can build and push it's own image to the private docker registry.
 
 This private docker registry can have several uses, first of all can be used as the docker images source for deploying and distributing our applications. Another possible use of the private docker registry will be shown in the next section.
+
+## STEP 3: [Orchestrate GitLab projects](docs/STEP_3.md)

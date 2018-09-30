@@ -147,3 +147,5 @@ To increase the concurrency level to 5 jobs, run the following command:
 The runner configurations is automatically reloaded (you can check the gitlab-runner log for it).
 
 Now you can retrigger the pipeline you runned in the previous step and see the three jobs in the `test` stage running in parallel.
+
+## STEP 2: [Use GitLab as private docker registry](docs/STEP_2.md)
