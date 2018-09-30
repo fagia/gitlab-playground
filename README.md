@@ -20,4 +20,6 @@ A step-by-step guide to showcase GitLab CI/CD capabilities
 
 ### STEP 4: [Monitor GitLab pipelines](docs/STEP_4.md)
 
-### STEP 5: [Clean-up (optional)](docs/STEP_5.md)
+### STEP 5: [GitLab CI/CD goodies](docs/STEP_5.md)
+
+### STEP 6: [Clean-up (optional)](docs/STEP_6.md)

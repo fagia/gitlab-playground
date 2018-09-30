@@ -1,15 +1,7 @@
-## STEP 5: Clean-up (optional)
+## STEP 5: GitLab CI/CD goodies
 
-When you are done with this session or you want to restart from scratch, you can reset the whole demo contents with the following commands.
+### Templates
 
-### Stop services
+### Artifacts
 
-    docker-compose down
-
-### Logout from GitLab private docker registry
-
-    docker logout gitlab.session1.techlunch.com:4567
-
-### Permanently delete persistent data
-
-    rm -Rf ./gitlab ./gitlab-runner
+## STEP 6: [Clean-up (optional)](STEP_6.md)
