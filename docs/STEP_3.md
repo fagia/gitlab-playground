@@ -54,74 +54,41 @@ In the same root directory, create also the two following files:
 
 <pre>
 python-gitlab
+click
 </pre>
 
-For now, the only library specified in the requirements file will be `python-gitlab` that is a quite useful Python package providing access to the GitLab API (https://python-gitlab.readthedocs.io/en/stable/).
+The libraries specified in the requirements file are:
+- `python-gitlab`: a quite useful Python package providing access to the GitLab API (https://python-gitlab.readthedocs.io/en/stable/).
+- `click`: a Python package for easily creating command line interfaces.
 
 **cmd-tag-project.py**
 
 <pre>
-import getopt
+import click
 import gitlab
-import sys
 
-def check_mandatory_opt(help_msg, name, value):
-    if not value:
-        print('Error: missing option "{}"'.format(name))
-        print(help_msg)
-        sys.exit(2)
-
-def parse_opts(argv):
-    help_msg = 'Usage: {} -t &lt;gitlabPrivateToken&gt; -u &lt;gitlabBaseUrl&gt;'.format(argv[0])
-    token = None
-    base_url = None
-    project_group_and_name = None
-    tag_name = None
-    try:
-        optlist, args = getopt.getopt(argv[1:], 'ht:u:p:t:', ['help', 'token=', 'url=', 'projectgroupandname=', 'tagname='])
-    except getopt.GetoptError:
-        print('Error: unknown option(s)')
-        print(help_msg)
-        sys.exit(2)
-    for opt, val in optlist:
-        if opt in ("-h", "--help"):
-            print(help_msg)
-            sys.exit()
-        elif opt in ("-t", "--token"):
-            token = val
-        elif opt in ("-u", "--url"):
-            base_url = val
-        elif opt in ("-p", "--projectgroupandname"):
-            project_group_and_name = val
-        elif opt in ("-t", "--tagname"):
-            tag_name = val
-    check_mandatory_opt(help_msg, 'token', token)
-    check_mandatory_opt(help_msg, 'url', base_url)
-    check_mandatory_opt(help_msg, 'projectgroupandname', project_group_and_name)
-    check_mandatory_opt(help_msg, 'tagname', tag_name)
-    return base_url, token, project_group_and_name, tag_name
-
-def init_connection_to_gitlab(base_url, token):
-    return gitlab.Gitlab(base_url, private_token=token)
-
-def tag_gitlab_project(gl, project_group_and_name, tag_name):
+@click.command()
+@click.option('--base_url', help='The GitLab server base URL (e.g: http://gitlab.session1.techlunch.com:9980/)')
+@click.option('--api_access_token', help='A GitLab API token')
+@click.option('--project_group_and_name', help='The group/name of the project to be tagged (e.g: tech-lunch/service-test)')
+@click.option('--tag_name', help='/he tag name to be created')
+def main(base_url, api_access_token, project_group_and_name, tag_name):
     print('tagging project "{}" with tag "{}"'.format(project_group_and_name, tag_name))
-    project = gl.projects.get(project_group_and_name)
-    project.tags.create({'tag_name': tag_name, 'ref': 'master'})
-
-def main(argv):
-    base_url, token, project_group_and_name, tag_name = parse_opts(argv)
-    gl = init_connection_to_gitlab(base_url, token)
-    tag_gitlab_project(gl, project_group_and_name, tag_name)
+    (gitlab
+        .Gitlab(base_url, private_token=api_access_token)
+        .projects
+        .get(project_group_and_name)
+        .tags
+        .create({'tag_name': tag_name, 'ref': 'master'}))
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main()
 </pre>
 
 The above script is accepting as input options:
-- an url pointing to a GitLab server
-- an API token
-- the group/name of the project to be tagged
+- the GitLab server base URL (e.g: http://gitlab.session1.techlunch.com:9980/)
+- a GitLab API token
+- the group/name of the project to be tagged (e.g: tech-lunch/service-test)
 - the tag name to be created
 
 Now edit the `.gitlab-ci.yml` file by replacing its contents with the following:
@@ -156,12 +123,20 @@ Now use the WebIDE GUI to stage and commit all the new and changed files and see
 
 Since this is still an open issue for the CE version of GitLab: https://gitlab.com/gitlab-org/gitlab-ce/issues/41084, we have to create a *fake* user and issue a PAT (Personal Access Token) that we'll pass to the CI/CD commands that work with GitLab API.
 
-Go to GitLab GUI Admin area, go to Users area and click button `New user`. Give the new user `ci-cd-executor` as both name and username and `ci-cd-executor@nowhere.com` as email. Click button `Create user` and then `Edit` button and enter a password for this user and `Save changes`.
-Go to Groups area, enter the `tech-lunch` group and add the user `ci-cd-executor` as `Maintainer` of the group.
-Now logout from `root` user and log back in as `ci-cd-executor`.
-Once a new passowrd has been set and logged in again, click on the top right user avatar and access the `Settings` area and then the `Access tokens` area.
-Add a new personal access token with name `ci-cd-execution` and the `api` scope checked. Copy the newly created token value and log back as `root`.
-Access the CI/CD settings area for the `tech-lunch` group and open the `Variables` section, here add a new protected variable with name `COMMANDS_API_TOKEN` and value the personal access token value you just copied.
+- Go to GitLab GUI Admin area, go to Users area and click button `New user`.
+- Give the new user `ci-cd-executor` as both name and username and `ci-cd-executor@nowhere.com` as email.
+- Click button `Create user`.
+- Click `Edit` button and enter a password for this user and click `Save changes`.
+- Go to Groups area, enter the `tech-lunch` group and add the user `ci-cd-executor` as `Maintainer` of the group.
+- Go back to Users area, enter the `ci-cd-executor` user and click `Impersonate` button.
+- Click on the top right `ci-cd-executor` user avatar and access his `Settings` area.
+- Access the `Access tokens` area.
+- Add a new personal access token with name `ci-cd-execution` and the `api` scope checked.
+- Click `Create personal access token` button.
+- Copy the newly created token value.
+- Click on the top right button to stop impersonating the `ci-cd-executor` user.
+- Access the CI/CD settings area for the `tech-lunch` group and open the `Variables` section.
+- Add a new protected variable with name `COMMANDS_API_TOKEN` and as value the personal access token you just copied.
 
 ### Create a GitLab project for running service tests
 
@@ -172,7 +147,7 @@ Then add a `.gitlab-ci.yml` file to this new repo with the following basic stage
 <pre>
 variables:
     CMD_TAG_PROJECT_IMAGE: "gitlab.session1.techlunch.com:4567/tech-lunch/ci-cd-commands/cmd-tag-project:0.0.1"
-    CMD_TAG_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --url $GITLAB_SERVER_BASE_URL --token $COMMANDS_API_TOKEN --projectgroupandname tech-lunch/service-tests --tagname ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}_${CI_JOB_ID}"
+    CMD_TAG_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --base_url $GITLAB_SERVER_BASE_URL --api_access_token $COMMANDS_API_TOKEN --project_group_and_name tech-lunch/service-tests --tag_name ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}_${CI_JOB_ID}"
 
 before_script:
     - echo $CI_BUILD_TOKEN | docker login --username=$CI_REGISTRY_USER --password-stdin $CI_REGISTRY
@@ -254,7 +229,7 @@ package-and-deploy:
     stage: downstream
     variables:
         CMD_TAG_PROJECT_IMAGE: "gitlab.session1.techlunch.com:4567/tech-lunch/ci-cd-commands/cmd-tag-project:0.0.1"
-        CMD_TAG_SERVICE_TESTS_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --url $GITLAB_SERVER_BASE_URL --token $COMMANDS_API_TOKEN --projectgroupandname tech-lunch/service-tests --tagname ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}_${CI_JOB_ID}"
+        CMD_TAG_SERVICE_TESTS_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --base_url $GITLAB_SERVER_BASE_URL --api_access_token $COMMANDS_API_TOKEN --project_group_and_name tech-lunch/service-tests --tag_name ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}_${CI_JOB_ID}"
     script:
         - docker pull $CMD_TAG_PROJECT_IMAGE
         - docker run $CMD_TAG_SERVICE_TESTS_PROJECT
