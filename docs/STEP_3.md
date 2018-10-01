@@ -119,6 +119,8 @@ The newly defined pipeline stage will build and push the `cmd-tag-project` docke
 
 Now use the WebIDE GUI to stage and commit all the new and changed files and see the new pipeline running.
 
+Here you can inspect the images built and pushed by the pipeline that has just runned: http://gitlab.session1.techlunch.com:9980/tech-lunch/ci-cd-commands/cmd-tag-project/container_registry
+
 ### Create an user with read/write PAT to invoke GitLab API from CI/CD commands
 
 Since this is still an open issue for the CE version of GitLab: https://gitlab.com/gitlab-org/gitlab-ce/issues/41084, we have to create a *fake* user and issue a PAT (Personal Access Token) that we'll pass to the CI/CD commands that work with GitLab API.
@@ -126,7 +128,6 @@ Since this is still an open issue for the CE version of GitLab: https://gitlab.c
 - Go to GitLab GUI Admin area, go to Users area and click button `New user`.
 - Give the new user `ci-cd-executor` as both name and username and `ci-cd-executor@nowhere.com` as email.
 - Click button `Create user`.
-- Click `Edit` button and enter a password for this user and click `Save changes`.
 - Go to Groups area, enter the `tech-lunch` group and add the user `ci-cd-executor` as `Maintainer` of the group.
 - Go back to Users area, enter the `ci-cd-executor` user and click `Impersonate` button.
 - Click on the top right `ci-cd-executor` user avatar and access his `Settings` area.

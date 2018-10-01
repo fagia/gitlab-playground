@@ -2,6 +2,10 @@
 
 ### Templates
 
+TODO
+
 ### Artifacts
+
+TODO
 
 ## STEP 6: [Clean-up (optional)](STEP_6.md)
