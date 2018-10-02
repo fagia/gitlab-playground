@@ -41,9 +41,15 @@ After you logged in to the GitLab web GUI, click on the "Create a group" link. E
 
 ### Configure a GitLab CI group runner
 
-In order to run CI/CD jobs, GitLab needs to have runners. There are various type of runners and you can get a deeper understanding of the available options here: https://docs.gitlab.com/ce/ci/runners/README.html. In this session we will leverage a `docker group runner`.
+In order to run CI/CD jobs, GitLab needs to have runners.
 
-A `docker runner` executes it's job inside a docker image. In our case we will setup a `docker socket binding` execution by running the job inside a docker image which have docker available through the bind-mount `/var/run/docker.sock` (for more details: https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-socket-binding).
+A `GitLab runner` is a process in charge of executing the scripts defined in the `.gitlab-ci.yml` file.
+
+Each GitLab runner has to define an `executor` in which scripts are actually executed. There are various type of executors that a GitLab runner can define (SSH, Shell, VirtualBox, Parallels, Docker or Kubernetes). You can get a deeper understanding of the available options here https://docs.gitlab.com/ce/ci/runners/README.html and here https://docs.gitlab.com/runner/executors/.
+
+In this session we will leverage a `docker group runner`.
+
+A `docker runner` executes it's scripts inside a docker image. In our case we will setup a `docker socket binding` execution by running the scripts inside a docker image which have docker available through the bind-mount of the unix socket that the host's docker daemon listens to (for more details: https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-socket-binding).
 
 A `group runner` is a runner that can be picked up by any job of any project that belongs to the group which the runner is associated to (as long as the runner is configured to run for any tag or the job is marked with a matching tag).
 
