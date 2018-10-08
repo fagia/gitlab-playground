@@ -53,8 +53,8 @@ In the same root directory, create also the two following files:
 **requirements.txt**
 
 <pre>
-python-gitlab
-click
+python-gitlab==1.6.0
+click==7.0
 </pre>
 
 The libraries specified in the requirements file are:

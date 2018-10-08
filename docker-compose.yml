@@ -3,7 +3,7 @@ version: '3'
 services:
 
   gitlab.session1.techlunch.com:
-    image: 'gitlab/gitlab-ce:11.3.0-ce.0'
+    image: 'gitlab/gitlab-ce:11.3.4-ce.0'
     hostname: 'gitlab.session1.techlunch.com'
     environment:
       GITLAB_OMNIBUS_CONFIG: |
