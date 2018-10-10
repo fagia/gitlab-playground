@@ -56,7 +56,7 @@ A `group runner` is a runner that can be picked up by any job of any project tha
 Visit the `tech-lunch` group's CI/CD settings section (http://gitlab.playground.test:9980/groups/tech-lunch/-/settings/ci_cd), expand `Runners` section and copy the registration token, then run the following command after having relaced `GROUP-TOKEN-HERE` with the value you have just copied:
 
     REGISTRATION_TOKEN=GROUP-TOKEN-HERE
-    docker exec -it session-1-gitlab-ci_gitlab-runner_1 gitlab-runner register \
+    docker exec -it gitlab-playground_gitlab-runner_1 gitlab-runner register \
         --non-interactive \
         --url "http://gitlab.playground.test:9980/" \
         --registration-token "$REGISTRATION_TOKEN" \
@@ -65,10 +65,10 @@ Visit the `tech-lunch` group's CI/CD settings section (http://gitlab.playground.
         --locked="false" \
         --executor "docker" \
         --env "HOST_BUILDS_VOLUME_PREFIX=$(pwd)/gitlab-runner" \
-        --env "HOST_NETWORK=session-1-gitlab-ci_default" \
+        --env "HOST_NETWORK=gitlab-playground_default" \
         --env "GITLAB_SERVER_BASE_URL=http://gitlab.playground.test:9980/" \
         --docker-image docker:stable \
-        --docker-network-mode session-1-gitlab-ci_default \
+        --docker-network-mode gitlab-playground_default \
         --docker-volumes "/var/run/docker.sock:/var/run/docker.sock" \
         --docker-volumes "$(pwd)/gitlab-runner/builds:/builds"
 
@@ -148,7 +148,7 @@ This is because when registering a runner, the default concurrency of 1 cannot b
 However it's possible to tweak runners configuration at any time by editing the config.toml file.
 To increase the concurrency level to 5 jobs, run the following command:
 
-    docker exec -it session-1-gitlab-ci_gitlab-runner_1 bin/sh -c "sed -i -E 's/^concurrent = [0-9]+$/concurrent = 5/' /etc/gitlab-runner/config.toml && cat /etc/gitlab-runner/config.toml"
+    docker exec -it gitlab-playground_gitlab-runner_1 bin/sh -c "sed -i -E 's/^concurrent = [0-9]+$/concurrent = 5/' /etc/gitlab-runner/config.toml && cat /etc/gitlab-runner/config.toml"
 
 The runner configurations is automatically reloaded (you can check the gitlab-runner log for it).
 
