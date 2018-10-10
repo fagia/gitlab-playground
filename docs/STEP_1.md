@@ -4,25 +4,25 @@
 
 Add the following entry to your `/etc/hosts` file:
 
-    127.0.0.1       gitlab.session1.techlunch.com
+    127.0.0.1       gitlab.playground.test
 
 Clone this repository and start the services with docker-compose:
 
-    git clone https://github.com/fagia/tech-lunch-session-1-gitlab-ci.git session-1-gitlab-ci
-    cd session-1-gitlab-ci
+    git clone https://github.com/fagia/gitlab-playground.git gitlab-playground
+    cd gitlab-playground
     docker-compose up -d
 
 You can inspect the GitLab startup logs with:
 
-    docker-compose logs -f gitlab.session1.techlunch.com
+    docker-compose logs -f gitlab.playground.test
 
 ### Reset GitLab root password
 
 Since this is the first startup, it might take a while before the GitLab Docker container starts to respond to queries. The initial setup should have been successfully completed once you read `gitlab Reconfigured!` in the logs.
 
-    docker-compose logs -f gitlab.session1.techlunch.com 2>&1 | grep 'gitlab Reconfigured!'
+    docker-compose logs -f gitlab.playground.test 2>&1 | grep 'gitlab Reconfigured!'
 
-After the GitLab service has started successfully, visit the GitLab web GUI here: http://gitlab.session1.techlunch.com:9980/. 
+After the GitLab service has started successfully, visit the GitLab web GUI here: http://gitlab.playground.test:9980/. 
 Enter and confirm the new password for the newly create user `root`. Click `Change your password` button.
 
 Now you can log in to the GitLab web GUI with default user `root` and the password you have just entered.
@@ -53,12 +53,12 @@ A `docker runner` executes it's scripts inside a docker image. In our case we wi
 
 A `group runner` is a runner that can be picked up by any job of any project that belongs to the group which the runner is associated to (as long as the runner is configured to run for any tag or the job is marked with a matching tag).
 
-Visit the `tech-lunch` group's CI/CD settings section (http://gitlab.session1.techlunch.com:9980/groups/tech-lunch/-/settings/ci_cd), expand `Runners` section and copy the registration token, then run the following command after having relaced `GROUP-TOKEN-HERE` with the value you have just copied:
+Visit the `tech-lunch` group's CI/CD settings section (http://gitlab.playground.test:9980/groups/tech-lunch/-/settings/ci_cd), expand `Runners` section and copy the registration token, then run the following command after having relaced `GROUP-TOKEN-HERE` with the value you have just copied:
 
     REGISTRATION_TOKEN=GROUP-TOKEN-HERE
     docker exec -it session-1-gitlab-ci_gitlab-runner_1 gitlab-runner register \
         --non-interactive \
-        --url "http://gitlab.session1.techlunch.com:9980/" \
+        --url "http://gitlab.playground.test:9980/" \
         --registration-token "$REGISTRATION_TOKEN" \
         --description "docker-group-runner" \
         --run-untagged \
@@ -66,7 +66,7 @@ Visit the `tech-lunch` group's CI/CD settings section (http://gitlab.session1.te
         --executor "docker" \
         --env "HOST_BUILDS_VOLUME_PREFIX=$(pwd)/gitlab-runner" \
         --env "HOST_NETWORK=session-1-gitlab-ci_default" \
-        --env "GITLAB_SERVER_BASE_URL=http://gitlab.session1.techlunch.com:9980/" \
+        --env "GITLAB_SERVER_BASE_URL=http://gitlab.playground.test:9980/" \
         --docker-image docker:stable \
         --docker-network-mode session-1-gitlab-ci_default \
         --docker-volumes "/var/run/docker.sock:/var/run/docker.sock" \
@@ -96,7 +96,7 @@ Paste the following as the `.gitlab-ci.yml` file content:
         script:
             - docker run --rm hello-world
 
-As soon as the file gets pushed to the repo, a new pipeline will start, you can check the output of the first execution here: http://gitlab.session1.techlunch.com:9980/tech-lunch/hello-world/pipelines
+As soon as the file gets pushed to the repo, a new pipeline will start, you can check the output of the first execution here: http://gitlab.playground.test:9980/tech-lunch/hello-world/pipelines
 
 ### Improve the CI/CD stages for the first project
 

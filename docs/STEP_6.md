@@ -8,7 +8,7 @@ When you are done with this session or you want to restart from scratch, you can
 
 ### Logout from GitLab private docker registry
 
-    docker logout gitlab.session1.techlunch.com:4567
+    docker logout gitlab.playground.test:4567
 
 ### Permanently delete persistent data
 

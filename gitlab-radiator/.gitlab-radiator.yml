@@ -1,5 +1,5 @@
 gitlab:
-  url: http://gitlab.session1.techlunch.com:9980/
+  url: http://gitlab.playground.test:9980/
 projects:
   exclude: tech-lunch/ci-cd-commands/.*
   order: ['name']

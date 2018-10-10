@@ -5,11 +5,11 @@ Some open source projects for monitoring GitLab pipelines exist, one of these is
 
 In this session we're going to use a fork of the `GitLab Radiator` that has support for running as docker containter: https://github.com/fagia/gitlab-radiator.
 The required docker container is already running in the docker-compose application, what is missing is to restart it with the GitLab API private access token that has been created in step 3.
-Run the following command after having relaced `API_TOKEN_HERE` with the value you can copy from the `tech-lunch` CI/CD variable named `COMMANDS_API_TOKEN`(http://gitlab.session1.techlunch.com:9980/groups/tech-lunch/-/settings/ci_cd):
+Run the following command after having relaced `API_TOKEN_HERE` with the value you can copy from the `tech-lunch` CI/CD variable named `COMMANDS_API_TOKEN`(http://gitlab.playground.test:9980/groups/tech-lunch/-/settings/ci_cd):
 
     docker-compose rm -sf gitlab-radiator
     GITLAB_ACCESS_TOKEN=API_TOKEN_HERE docker-compose up -d gitlab-radiator
 
-Now you can see the GitLab Radiator GUI here: http://gitlab.session1.techlunch.com:9933/
+Now you can see the GitLab Radiator GUI here: http://gitlab.playground.test:9933/
 
 ## STEP 5: [GitLab CI/CD goodies](STEP_5.md)

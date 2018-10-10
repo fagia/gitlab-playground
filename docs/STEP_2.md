@@ -4,7 +4,7 @@ GitLab has native support for private docker registries: https://docs.gitlab.com
 
 In order to test the availability of the private docker registry hosted by GitLab, type the following command and enter your GitLab credentials:
 
-    docker login gitlab.session1.techlunch.com:4567
+    docker login gitlab.playground.test:4567
 
 This login will be used directly in the pipelines that build and push images to the private docker registry. Each project can build and push it's own image to the private docker registry.
 

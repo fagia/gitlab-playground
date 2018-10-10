@@ -1,6 +1,6 @@
-# Tech Lunch | Session 1 | GitLab CI
+# GitLab CI/CD Playground
 
-A step-by-step guide to showcase GitLab CI/CD capabilities
+A step-by-step guide to play with GitLab CI/CD capabilities
 
 ## Prerequisites
 

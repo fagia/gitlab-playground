@@ -68,7 +68,7 @@ import click
 import gitlab
 
 @click.command()
-@click.option('--base_url', help='The GitLab server base URL (e.g: http://gitlab.session1.techlunch.com:9980/)')
+@click.option('--base_url', help='The GitLab server base URL (e.g: http://gitlab.playground.test:9980/)')
 @click.option('--api_access_token', help='A GitLab API token')
 @click.option('--project_group_and_name', help='The group/name of the project to be tagged (e.g: tech-lunch/service-test)')
 @click.option('--tag_name', help='/he tag name to be created')
@@ -86,7 +86,7 @@ if __name__ == "__main__":
 </pre>
 
 The above script is accepting as input options:
-- the GitLab server base URL (e.g: http://gitlab.session1.techlunch.com:9980/)
+- the GitLab server base URL (e.g: http://gitlab.playground.test:9980/)
 - a GitLab API token
 - the group/name of the project to be tagged (e.g: tech-lunch/service-test)
 - the tag name to be created
@@ -119,7 +119,7 @@ The newly defined pipeline stage will build and push the `cmd-tag-project` docke
 
 Now use the WebIDE GUI to stage and commit all the new and changed files and see the new pipeline running.
 
-Here you can inspect the images built and pushed by the pipeline that has just runned: http://gitlab.session1.techlunch.com:9980/tech-lunch/ci-cd-commands/cmd-tag-project/container_registry
+Here you can inspect the images built and pushed by the pipeline that has just runned: http://gitlab.playground.test:9980/tech-lunch/ci-cd-commands/cmd-tag-project/container_registry
 
 ### Create an user with read/write PAT to invoke GitLab API from CI/CD commands
 
@@ -147,7 +147,7 @@ Then add a `.gitlab-ci.yml` file to this new repo with the following basic stage
 
 <pre>
 variables:
-    CMD_TAG_PROJECT_IMAGE: "gitlab.session1.techlunch.com:4567/tech-lunch/ci-cd-commands/cmd-tag-project:0.0.1"
+    CMD_TAG_PROJECT_IMAGE: "gitlab.playground.test:4567/tech-lunch/ci-cd-commands/cmd-tag-project:0.0.1"
     CMD_TAG_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --base_url $GITLAB_SERVER_BASE_URL --api_access_token $COMMANDS_API_TOKEN --project_group_and_name tech-lunch/service-tests --tag_name ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}_${CI_JOB_ID}"
 
 before_script:
@@ -168,7 +168,7 @@ tag-project:
         - docker run $CMD_TAG_PROJECT
 </pre>
 
-Once the pipeline that has just been created completes, a new tag comes into the repo (http://gitlab.session1.techlunch.com:9980/tech-lunch/service-tests/tags)
+Once the pipeline that has just been created completes, a new tag comes into the repo (http://gitlab.playground.test:9980/tech-lunch/service-tests/tags)
 
 ### Trigger service-tests after successful hello-world project builds
 
@@ -229,7 +229,7 @@ package-and-deploy:
 <b>trigger-downstream-pipelines:
     stage: downstream
     variables:
-        CMD_TAG_PROJECT_IMAGE: "gitlab.session1.techlunch.com:4567/tech-lunch/ci-cd-commands/cmd-tag-project:0.0.1"
+        CMD_TAG_PROJECT_IMAGE: "gitlab.playground.test:4567/tech-lunch/ci-cd-commands/cmd-tag-project:0.0.1"
         CMD_TAG_SERVICE_TESTS_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --base_url $GITLAB_SERVER_BASE_URL --api_access_token $COMMANDS_API_TOKEN --project_group_and_name tech-lunch/service-tests --tag_name ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}_${CI_JOB_ID}"
     script:
         - docker pull $CMD_TAG_PROJECT_IMAGE
