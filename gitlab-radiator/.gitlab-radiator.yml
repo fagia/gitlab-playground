@@ -1,13 +1,13 @@
 gitlab:
   url: http://gitlab.playground.test:9980/
 projects:
-  exclude: tech-lunch/ci-cd-commands/.*
+  exclude: playground/ci-cd-commands/.*
   order: ['name']
 interval: 10
 port: 3000
 zoom: 0.7
 columns: 2
 header:
-  title: 'Tech Lunch projects'
+  title: 'GitLab Playground Projects'
   subtitle: 'Pipelines monitor'
   image: 'https://www.thoughtworks.com/imgs/run_sustainable_business.png'

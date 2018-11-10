@@ -3,7 +3,7 @@ version: '3'
 services:
 
   gitlab.playground.test:
-    image: 'gitlab/gitlab-ce:11.3.4-ce.0'
+    image: 'gitlab/gitlab-ce:11.4.5-ce.0'
     hostname: 'gitlab.playground.test'
     environment:
       GITLAB_OMNIBUS_CONFIG: |
@@ -19,7 +19,7 @@ services:
       - './gitlab/data:/var/opt/gitlab'
 
   gitlab-runner:
-    image: 'gitlab/gitlab-runner:v11.3.1'
+    image: 'gitlab/gitlab-runner:alpine-v11.4.2'
     volumes:
       - './gitlab-runner/config:/etc/gitlab-runner'
       - '/var/run/docker.sock:/var/run/docker.sock'

@@ -4,8 +4,8 @@ Since we want to have some useful CI/CD scripts to be shared and re-used in our 
 
 ### Add a subgroup for CI/CD commands
 
-Create a new subgroup inside the `tech-lunch` group, name it `ci-cd-commands`.
-This subgroup will contain some common CI/CD commands (such as triggering new pipelines or waiting for running pipelines to terminate). These commands will have the form of docker images that can be pulled and runned inside the `tech-lunch` private group pipelines.
+Create a new subgroup inside the `playground` group, name it `ci-cd-commands`.
+This subgroup will contain some common CI/CD commands (such as triggering new pipelines or waiting for running pipelines to terminate). These commands will have the form of docker images that can be pulled and runned inside the `playground` private group pipelines.
 
 ### Create the first CI/CD command
 
@@ -59,7 +59,7 @@ click==7.0
 
 The libraries specified in the requirements file are:
 - `python-gitlab`: a quite useful Python package providing access to the GitLab API (https://python-gitlab.readthedocs.io/en/stable/).
-- `click`: a Python package for easily creating command line interfaces.
+- `click`: a Python package for easily creating command line interfaces (https://palletsprojects.com/p/click/).
 
 **cmd-tag-project.py**
 
@@ -70,7 +70,7 @@ import gitlab
 @click.command()
 @click.option('--base_url', help='The GitLab server base URL (e.g: http://gitlab.playground.test:9980/)')
 @click.option('--api_access_token', help='A GitLab API token')
-@click.option('--project_group_and_name', help='The group/name of the project to be tagged (e.g: tech-lunch/service-test)')
+@click.option('--project_group_and_name', help='The group/name of the project to be tagged (e.g: playground/service-test)')
 @click.option('--tag_name', help='/he tag name to be created')
 def main(base_url, api_access_token, project_group_and_name, tag_name):
     print('tagging project "{}" with tag "{}"'.format(project_group_and_name, tag_name))
@@ -88,7 +88,7 @@ if __name__ == "__main__":
 The above script is accepting as input options:
 - the GitLab server base URL (e.g: http://gitlab.playground.test:9980/)
 - a GitLab API token
-- the group/name of the project to be tagged (e.g: tech-lunch/service-test)
+- the group/name of the project to be tagged (e.g: playground/service-test)
 - the tag name to be created
 
 Now edit the `.gitlab-ci.yml` file by replacing its contents with the following:
@@ -119,7 +119,7 @@ The newly defined pipeline stage will build and push the `cmd-tag-project` docke
 
 Now use the WebIDE GUI to stage and commit all the new and changed files and see the new pipeline running.
 
-Here you can inspect the images built and pushed by the pipeline that has just runned: http://gitlab.playground.test:9980/tech-lunch/ci-cd-commands/cmd-tag-project/container_registry
+Here you can inspect the images built and pushed by the pipeline that has just runned: http://gitlab.playground.test:9980/playground/ci-cd-commands/cmd-tag-project/container_registry
 
 ### Create an user with read/write PAT to invoke GitLab API from CI/CD commands
 
@@ -128,7 +128,7 @@ Since this is still an open issue for the CE version of GitLab: https://gitlab.c
 - Go to GitLab GUI Admin area, go to Users area and click button `New user`.
 - Give the new user `ci-cd-executor` as both name and username and `ci-cd-executor@nowhere.com` as email.
 - Click button `Create user`.
-- Go to Groups area, enter the `tech-lunch` group and add the user `ci-cd-executor` as `Maintainer` of the group.
+- Go to Groups area, enter the `playground` group and add the user `ci-cd-executor` as `Maintainer` of the group.
 - Go back to Users area, enter the `ci-cd-executor` user and click `Impersonate` button.
 - Click on the top right `ci-cd-executor` user avatar and access his `Settings` area.
 - Access the `Access tokens` area.
@@ -136,19 +136,19 @@ Since this is still an open issue for the CE version of GitLab: https://gitlab.c
 - Click `Create personal access token` button.
 - Copy the newly created token value.
 - Click on the top right button to stop impersonating the `ci-cd-executor` user.
-- Access the CI/CD settings area for the `tech-lunch` group and open the `Variables` section.
-- Add a new protected variable with name `COMMANDS_API_TOKEN` and as value the personal access token you just copied.
+- Access the CI/CD settings area for the `playground` group and open the `Variables` section.
+- Add a new **protected** variable with name `COMMANDS_API_TOKEN` and as value the personal access token you just copied.
 
 ### Create a GitLab project for running service tests
 
-Go to the `tech-lunch` group, click on the "New project" button. Enter `service-tests` as project name and click `Create project` button.
+Go to the `playground` group, click on the "New project" button. Enter `service-tests` as project name and click `Create project` button.
 
 Then add a `.gitlab-ci.yml` file to this new repo with the following basic stage just to try out the command that we just builded and pushed in the previous steps:
 
 <pre>
 variables:
-    CMD_TAG_PROJECT_IMAGE: "gitlab.playground.test:4567/tech-lunch/ci-cd-commands/cmd-tag-project:0.0.1"
-    CMD_TAG_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --base_url $GITLAB_SERVER_BASE_URL --api_access_token $COMMANDS_API_TOKEN --project_group_and_name tech-lunch/service-tests --tag_name ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}_${CI_JOB_ID}"
+    CMD_TAG_PROJECT_IMAGE: "gitlab.playground.test:4567/playground/ci-cd-commands/cmd-tag-project:0.0.1"
+    CMD_TAG_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --base_url $GITLAB_SERVER_BASE_URL --api_access_token $COMMANDS_API_TOKEN --project_group_and_name playground/service-tests --tag_name ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}_${CI_JOB_ID}"
 
 before_script:
     - echo $CI_BUILD_TOKEN | docker login --username=$CI_REGISTRY_USER --password-stdin $CI_REGISTRY
@@ -168,28 +168,30 @@ tag-project:
         - docker run $CMD_TAG_PROJECT
 </pre>
 
-Once the pipeline that has just been created completes, a new tag comes into the repo (http://gitlab.playground.test:9980/tech-lunch/service-tests/tags)
+Once the pipeline that has just been created completes, a new tag will come into the repo (http://gitlab.playground.test:9980/playground/service-tests/tags)
 
 ### Trigger service-tests after successful hello-world project builds
 
 Now edit again the `.gitlab-ci.yml` file in the `service-tests` project and replace its exisiting content with the following:
 
-    stages:
-        - service tests
+<pre>
+stages:
+    - service tests
 
-    run-on-upstream:
-        stage: service tests
-        only:
-            - tags
-        script:
-            - docker run --rm alpine /bin/sh -c "echo 'fake run service tests on upstream change'"
+run-on-upstream:
+    stage: service tests
+    only:
+        - tags
+    script:
+        - docker run --rm alpine /bin/sh -c "echo 'fake run service tests on upstream change'"
 
-    run-on-commit:
-        stage: service tests
-        only:
-            - branches
-        script:
-            - docker run --rm alpine /bin/sh -c "echo 'fake run service tests on commit'"
+run-on-commit:
+    stage: service tests
+    only:
+        - branches
+    script:
+        - docker run --rm alpine /bin/sh -c "echo 'fake run service tests on commit'"
+</pre>
 
 Then edit the `.gitlab-ci.yml` file in the `hello-world` project and replace its exisiting content with the following:
 
@@ -229,8 +231,8 @@ package-and-deploy:
 <b>trigger-downstream-pipelines:
     stage: downstream
     variables:
-        CMD_TAG_PROJECT_IMAGE: "gitlab.playground.test:4567/tech-lunch/ci-cd-commands/cmd-tag-project:0.0.1"
-        CMD_TAG_SERVICE_TESTS_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --base_url $GITLAB_SERVER_BASE_URL --api_access_token $COMMANDS_API_TOKEN --project_group_and_name tech-lunch/service-tests --tag_name ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}_${CI_JOB_ID}"
+        CMD_TAG_PROJECT_IMAGE: "gitlab.playground.test:4567/playground/ci-cd-commands/cmd-tag-project:0.0.1"
+        CMD_TAG_SERVICE_TESTS_PROJECT: "--rm --network $HOST_NETWORK $CMD_TAG_PROJECT_IMAGE --base_url $GITLAB_SERVER_BASE_URL --api_access_token $COMMANDS_API_TOKEN --project_group_and_name playground/service-tests --tag_name ${CI_PROJECT_PATH_SLUG}_${CI_COMMIT_SHA}_${CI_JOB_ID}"
     script:
         - docker pull $CMD_TAG_PROJECT_IMAGE
         - docker run $CMD_TAG_SERVICE_TESTS_PROJECT
@@ -242,6 +244,8 @@ after_script:
     - docker logout $CI_REGISTRY</b>
 </pre>
 
-Now, after each and every successful build of the `hello-world` project, a new tag is created in the `service-tests` project and a new pipeline runs the service tests.
+Now, after each and every successful build of the `hello-world` project, thanks to the `trigger-downstream-pipelines` job, a new tag is created in the `service-tests` project and a new pipeline will run the service tests.
+
+You can check the `service-tests` project's pipelines here: http://gitlab.playground.test:9980/playground/service-tests/pipelines, the pipelines runned by an upstream pipeline will be identified with the originating commit in the tag name and they will have be run by the user `ci-cd-executor`.
 
 ## STEP 4: [Monitor GitLab pipelines](STEP_4.md)

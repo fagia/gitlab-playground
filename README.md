@@ -1,16 +1,16 @@
 # GitLab CI/CD Playground
 
-A step-by-step guide to play with GitLab CI/CD capabilities
+A step-by-step tutorial to play with GitLab CI/CD capabilities
 
 ## Prerequisites
 
 - Git: https://git-scm.com/
 - Docker + docker-compose: https://www.docker.com/get-started
-- Run `docker pull gitlab/gitlab-ce:11.3.4-ce.0` (this will speed up the next steps...)
-- Run `docker pull gitlab/gitlab-runner:v11.3.1` (...this too...)
+- Run `docker pull gitlab/gitlab-ce:11.4.5-ce.0` (this will speed up the next steps...)
+- Run `docker pull gitlab/gitlab-runner:alpine-v11.4.2` (...this too...)
 - Run `docker pull matteocajani/gitlab-radiator:0.0.2` (...and this too :) )
 
-## Step-by-step guide
+## Step-by-step tutorial
 
 ### STEP 1: [Create a GitLab project and add CI/CD capabilities to it](docs/STEP_1.md)
 
