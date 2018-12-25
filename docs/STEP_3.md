@@ -53,7 +53,7 @@ In the same root directory, create also the two following files:
 **requirements.txt**
 
 <pre>
-python-gitlab==1.6.0
+python-gitlab==1.7.0
 click==7.0
 </pre>
 

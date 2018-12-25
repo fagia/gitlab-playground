@@ -153,15 +153,21 @@ trigger-downstream-pipelines:
 
 As you may have noticed, as of now, even if there are more than one job defined for a specific stage, these jobs are being run sequentially.
 This is because when registering a runner, the default concurrency of 1 cannot be changed (there are several open issues on this).
-However it's possible to tweak runners configuration at any time by editing the config.toml file.
+However it's possible to tweak a runner configuration at any time by editing its config.toml file.
 To increase the concurrency level to 5 jobs, run the following command in a shell:
 
 <pre>
-docker exec -it gitlab-playground_gitlab-runner_1 bin/sh -c "sed -i -E 's/^concurrent = [0-9]+$/concurrent = 5/' /etc/gitlab-runner/config.toml && cat /etc/gitlab-runner/config.toml"
+docker \
+    exec \
+    -it \
+    gitlab-playground_gitlab-runner_1 \
+    bin/sh \
+    -c \
+    "sed -i -E 's/^concurrent = [0-9]+$/concurrent = 5/' /etc/gitlab-runner/config.toml && cat /etc/gitlab-runner/config.toml"
 </pre>
 
 The runner configuration is automatically reloaded (you can check the gitlab-runner log for it).
 
-Now you can retrigger the pipeline you previously runned and see that the three jobs in the `Test` stage will now be running in parallel.
+Now you can retrigger the pipeline you previously runned and see that the three jobs in the `Test` stage will now be run in parallel.
 
 ## STEP 2: [Use GitLab as private docker registry](STEP_2.md)
